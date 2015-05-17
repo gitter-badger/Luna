@@ -162,7 +162,7 @@ class Installer {
 	
 			case 'sqlite':
 				if (strtolower($db_prefix) == 'sqlite_')
-					error(__('The table prefix 'sqlite_' is reserved for use by the SQLite engine. Please choose a different prefix', 'luna'));
+					error(__('The table prefix \'sqlite_\' is reserved for use by the SQLite engine. Please choose a different prefix', 'luna'));
 				break;
 		}
 
@@ -179,7 +179,7 @@ class Installer {
 
 		// Validate prefix
 		if (strlen($db_prefix) > 0 && (!preg_match('%^[a-zA-Z_][a-zA-Z0-9_]*$%', $db_prefix) || strlen($db_prefix) > 40))
-		error(sprintf(__('The table prefix '%s' contains illegal characters or is too long. The prefix may contain the letters a to z, any numbers and the underscore character. They must however not start with a number. The maximum length is 40 characters. Please choose a different prefix', 'luna'), $db->prefix));
+		error(sprintf(__('The table prefix \'%s\' contains illegal characters or is too long. The prefix may contain the letters a to z, any numbers and the underscore character. They must however not start with a number. The maximum length is 40 characters. Please choose a different prefix', 'luna'), $db->prefix));
 		
 		// Load the appropriate DB layer class
 		Installer::load_database_driver($db_type);
@@ -1459,6 +1459,8 @@ class Installer {
 			'o_enable_advanced_search'	=> 1,
 			'o_announcement'			=> 0,
 			'o_announcement_message'	=> __('Announcement', 'luna'),
+			'o_announcement_title'		=> NULL,
+			'o_announcement_type'		=> 'ifno',
 			'o_rules'					=> 0,
 			'o_rules_message'			=> __('Rules', 'luna'),
 			'o_maintenance'				=> 0,
@@ -1571,7 +1573,7 @@ class Installer {
 		$db->query('INSERT INTO '.$db->prefix.'ranks (rank, min_posts) VALUES(\''.$db->escape(__('Member', 'luna')).'\', 10)')
 			or error('Unable to insert into table '.$db->prefix.'ranks. Please check your configuration and try again', __FILE__, __LINE__, $db->error());
 
-		require FORUM_ROOT.'include/general_functions.php';		
+		require FORUM_ROOT.'include/notifications.php';		
 		new_notification('2', 'backstage/about.php', 'Welcome to Luna, discover the possibilities!', 'luni-logo', 'luni');
 		
 		$db->end_transaction();

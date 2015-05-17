@@ -1,5 +1,5 @@
 /* Accent 6 - Ao */
-.navbar-inverse, .footer, .alert-all, .modal-form .modal-header, .modal-form .modal-footer, .navbar-default .navbar-toggle .icon-bar, .navbar-inverse .navbar-toggle .icon-bar, .btn-primary {
+.navbar-inverse, .footer, .alert-all, .modal-form .modal-header, .modal-form .modal-footer, .navbar-default .navbar-toggle .icon-bar, .navbar-inverse .navbar-toggle .icon-bar, .btn-primary, .modal-backdrop {
 	background-color: #08893e;
 }
 
@@ -7,7 +7,7 @@
 	background-color: #047a36;
 }
 
-.nav-tabs > li.active > a:hover, .nav-tabs > li.active > a:focus, .navbar-default, .new-item .label-default, a.list-group-item.active, a.list-group-item.active:hover, a.list-group-item.active:focus, .list-group-forum .list-group-item.active.new-item {
+.nav-tabs > li.active > a, .nav-tabs > li > a:hover, .nav-tabs > li.active > a, .nav-tabs > li > a:hover, .nav-tabs > li.active > a:hover, .nav-tabs > li.active > a:focus, .navbar-default, .new-item .label-default, a.list-group-item.active, a.list-group-item.active:hover, a.list-group-item.active:focus, .list-group-forum .list-group-item.active.new-item {
 	background-color: #016a2d;
 }
 
