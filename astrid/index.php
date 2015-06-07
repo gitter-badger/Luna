@@ -4,10 +4,10 @@
 		<meta charset="utf-8">
 		<meta http-equiv="X-UA-Compatible" content="IE=edge">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<title>Luna / Edge</title>
+		<title>Luna / Astrid</title>
 		<link href="css/bootstrap.min.css" rel="stylesheet">
 		<link href="css/font-awesome.min.css" rel="stylesheet">
-		<link href="css/edge.css" rel="stylesheet">
+		<link href="css/astrid.css" rel="stylesheet">
 	</head>
 	<body>
 		<nav class="navbar navbar-default">
@@ -63,7 +63,7 @@
 					</div>
 				</div>
 				<div class="col-xs-9 col-sm-9 col-md-10">
-					<h1>Welcome back, Edge!</h1>
+					<h1>Welcome back, Astrid!</h1>
 					<div class="row">
 						<div class="col-sm-7">
 							<div class="row">
@@ -118,10 +118,10 @@
 								<div class="col-sm-6">
 									<div class="panel panel-default">
 										<div class="panel-heading">
-											<h3 class="panel-title">About Edge</h3>
+											<h3 class="panel-title">About Astrid</h3>
 										</div>
 										<div class="panel-body">
-											<a class="btn btn-default btn-block" href="http://getluna.org/edge.php">About Edge</a>
+											<a class="btn btn-default btn-block" href="http://getluna.org/astrid.php">About Astrid</a>
 										</div>
 									</div>
 								</div>
