@@ -1,12 +1,20 @@
 <?php
 
 /*
- * Copyright (C) 2013-2015 Luna
- * License: http://opensource.org/licenses/MIT MIT
+ * Copyright (c) 2013-2015 Luna
+ * License under MIT
  */
 
 // Load the database layer we need
 switch ($db_type) {
+	case 'mysql':
+		require_once FORUM_ROOT.'include/ntdblayer/db_mysql.php';
+		break;
+
+	case 'mysql_innodb':
+		require_once FORUM_ROOT.'include/ntdblayer/db_mysql_innodb.php';
+		break;
+
 	case 'mysqli':
 		require_once FORUM_ROOT.'include/ntdblayer/db_mysqli.php';
 		break;
