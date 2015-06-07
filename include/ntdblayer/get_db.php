@@ -11,6 +11,10 @@ switch ($db_type) {
 		require_once FORUM_ROOT.'include/ntdblayer/db_mysqli.php';
 		break;
 
+	case 'mysqli_innodb':
+		require_once FORUM_ROOT.'include/ntdblayer/db_mysqli_innodb.php';
+		break;
+
 	default:
 		error('We can\'t find a \''.$db_type.'\'-based database. Please check the settings given in config.php.', __FILE__, __LINE__);
 		break;
