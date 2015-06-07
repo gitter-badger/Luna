@@ -10,15 +10,15 @@
 define('FORUM_ROOT', '../');
 require FORUM_ROOT.'include/common.php';
 
-if (!$luna_user['is_admmod'])
+if (!$is_admin)
 	header("Location: login.php");
-	
 if (isset($_POST['form_sent'])) {
 	confirm_referrer('backstage/settings.php', __('Bad HTTP_REFERER. If you have moved these forums from one location to another or switched domains, you need to update the Base URL manually in the database (look for o_base_url in the config table) and then clear the cache by deleting all .php files in the /cache directory.', 'luna'));
 
 	$form = array(
 		'board_title'			=> luna_trim($_POST['form']['board_title']),
 		'board_desc'			=> luna_trim($_POST['form']['board_desc']),
+		'board_tags'			=> luna_trim($_POST['form']['board_tags']),
 		'base_url'				=> luna_trim($_POST['form']['base_url']),
 		'default_timezone'		=> floatval($_POST['form']['default_timezone']),
 		'default_dst'			=> isset($_POST['form']['default_dst']) ? '1' : '0',
@@ -32,12 +32,15 @@ if (isset($_POST['form_sent'])) {
 		'report_method'			=> intval($_POST['form']['report_method']),
 		'mailing_list'			=> luna_trim($_POST['form']['mailing_list']),
 		'cookie_bar'			=> isset($_POST['form']['cookie_bar']) ? '1' : '0',
+		'cookie_bar_url'		=> luna_trim($_POST['form']['cookie_bar_url']),
 		'avatars'				=> isset($_POST['form']['avatars']) ? '1' : '0',
 		'avatars_dir'			=> luna_trim($_POST['form']['avatars_dir']),
 		'avatars_width'			=> (intval($_POST['form']['avatars_width']) > 0) ? intval($_POST['form']['avatars_width']) : 1,
 		'avatars_height'		=> (intval($_POST['form']['avatars_height']) > 0) ? intval($_POST['form']['avatars_height']) : 1,
 		'avatars_size'			=> (intval($_POST['form']['avatars_size']) > 0) ? intval($_POST['form']['avatars_size']) : 1,
 		'announcement'			=> isset($_POST['form']['announcement']) ? '1' : '0',
+		'announcement_title'	=> luna_trim($_POST['form']['announcement_title']),
+		'announcement_type'		=> luna_trim($_POST['form']['announcement_type']),
 		'announcement_message'	=> luna_trim($_POST['form']['announcement_message']),
 	);
 
@@ -153,6 +156,12 @@ if (isset($_GET['saved']))
 					<label class="col-sm-3 control-label"><?php _e('Board description', 'luna') ?><span class="help-block"><?php _e('What\'s this board about?', 'luna') ?></span></label>
 					<div class="col-sm-9">
 						<input type="text" class="form-control" name="form[board_desc]" maxlength="255" value="<?php echo luna_htmlspecialchars($luna_config['o_board_desc']) ?>" />
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-sm-3 control-label"><?php _e('Board tags', 'luna') ?><span class="help-block"><?php _e('Add some words that describe your board, separated by a comma', 'luna') ?></span></label>
+					<div class="col-sm-9">
+						<input type="text" class="form-control" name="form[board_tags]" maxlength="255" value="<?php echo luna_htmlspecialchars($luna_config['o_board_tags']) ?>" />
 					</div>
 				</div>
 				<div class="form-group">
@@ -374,6 +383,12 @@ if (isset($_GET['saved']))
 						</div>
 					</div>
 				</div>
+				<div class="form-group">
+					<label class="col-sm-3 control-label"><?php _e('Cookie bar URL', 'luna') ?><span class="help-block"><?php _e('Use your own URL for cookie information, by default, we provide our own page', 'luna') ?></span></label>
+					<div class="col-sm-9">
+						<input type="text" class="form-control" name="form[cookie_bar_url]" maxlength="255" value="<?php echo luna_htmlspecialchars($luna_config['o_cookie_bar_url']) ?>" />
+					</div>
+				</div>
 			</fieldset>
 		</div>
 	</div>
@@ -445,6 +460,43 @@ if (isset($_GET['saved']))
 								<?php _e('Enable this to display the below message in the board.', 'luna') ?>
 							</label>
 						</div>
+					</div>
+				</div>
+				<hr />
+				<div class="form-group">
+					<label class="col-sm-3 control-label"><?php _e('Announcement title', 'luna') ?><span class="help-block"><?php _e('You can leave this empty if there is no title', 'luna') ?></span></label>
+					<div class="col-sm-9">
+						<input type="text" class="form-control" name="form[announcement_title]" value="<?php echo $luna_config['o_announcement_title'] ?>" />
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-sm-3 control-label"><?php _e('Announcement type', 'luna') ?></label>
+					<div class="col-sm-9">
+						<label class="radio-inline">
+							<input type="radio" name="form[announcement_type]" value="default"<?php if ($luna_config['o_announcement_type'] == 'default') echo ' checked' ?>>
+							<?php _e('Default', 'luna') ?>
+						</label>
+						<label class="radio-inline">
+							<input type="radio" name="form[announcement_type]" value="info"<?php if ($luna_config['o_announcement_type'] == 'info') echo ' checked' ?>>
+							<?php _e('Info', 'luna') ?>
+						</label>
+						<label class="radio-inline">
+							<input type="radio" name="form[announcement_type]" value="success"<?php if ($luna_config['o_announcement_type'] == 'success') echo ' checked' ?>>
+							<?php _e('Success', 'luna') ?>
+						</label>
+						<label class="radio-inline">
+							<input type="radio" name="form[announcement_type]" value="warning"<?php if ($luna_config['o_announcement_type'] == 'warning') echo ' checked' ?>>
+							<?php _e('Warning', 'luna') ?>
+						</label>
+						<label class="radio-inline">
+							<input type="radio" name="form[announcement_type]" value="danger"<?php if ($luna_config['o_announcement_type'] == 'danger') echo ' checked' ?>>
+							<?php _e('Danger', 'luna') ?>
+						</label>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-sm-3 control-label"><?php _e('Announcement message', 'luna') ?></label>
+					<div class="col-sm-9">
 						<textarea class="form-control" name="form[announcement_message]" rows="5"><?php echo luna_htmlspecialchars($luna_config['o_announcement_message']) ?></textarea>
 					</div>
 				</div>

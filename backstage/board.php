@@ -10,7 +10,7 @@
 define('FORUM_ROOT', '../');
 require FORUM_ROOT.'include/common.php';
 
-if (!$luna_user['is_admmod'])
+if (!$is_admin)
 	header("Location: login.php");
 // Add a "default" forum
 if (isset($_POST['add_forum'])) {
@@ -23,6 +23,12 @@ if (isset($_POST['add_forum'])) {
 
 	$db->query('INSERT INTO '.$db->prefix.'forums (forum_name, cat_id) VALUES(\''.$db->escape($forum_name).'\', '.$add_to_cat.')') or error('Unable to create forum', __FILE__, __LINE__, $db->error());
 	$new_fid = $db->insert_id();
+
+	// Regenerate the forum cache
+	if (!defined('FORUM_CACHE_FUNCTIONS_LOADED'))
+		require FORUM_ROOT.'include/cache.php';
+	
+	generate_forum_cache();
 
 	redirect('backstage/board.php?edit_forum='.$new_fid);
 }
@@ -58,6 +64,12 @@ elseif (isset($_GET['del_forum'])) {
 
 		// Delete any subscriptions for this forum
 		$db->query('DELETE FROM '.$db->prefix.'forum_subscriptions WHERE forum_id='.$forum_id) or error('Unable to delete subscriptions', __FILE__, __LINE__, $db->error());
+
+		// Regenerate the forum cache
+		if (!defined('FORUM_CACHE_FUNCTIONS_LOADED'))
+			require FORUM_ROOT.'include/cache.php';
+		
+		generate_forum_cache();
 
 		redirect('backstage/board.php?saved=true');
 	} else { // If the user hasn't confirmed the delete
@@ -102,6 +114,12 @@ elseif (isset($_POST['update_positions'])) {
 
 		$db->query('UPDATE '.$db->prefix.'forums SET disp_position='.$disp_position.' WHERE id='.intval($forum_id)) or error('Unable to update forum', __FILE__, __LINE__, $db->error());
 	}
+	
+	// Regenerate the forum cache
+	if (!defined('FORUM_CACHE_FUNCTIONS_LOADED'))
+		require FORUM_ROOT.'include/cache.php';
+	
+	generate_forum_cache();
 
 	redirect('backstage/board.php?saved=true');
 } elseif (isset($_GET['edit_forum'])) {
@@ -154,11 +172,23 @@ elseif (isset($_POST['update_positions'])) {
 			}
 		}
 
+		// Regenerate the forum cache
+		if (!defined('FORUM_CACHE_FUNCTIONS_LOADED'))
+			require FORUM_ROOT.'include/cache.php';
+		
+		generate_forum_cache();
+
 		redirect('backstage/board.php?saved=true');
 	} elseif (isset($_POST['revert_perms'])) {
 		confirm_referrer('backstage/board.php');
 	
 		$db->query('DELETE FROM '.$db->prefix.'forum_perms WHERE forum_id='.$forum_id) or error('Unable to delete group forum permissions', __FILE__, __LINE__, $db->error());
+
+		// Regenerate the forum cache
+		if (!defined('FORUM_CACHE_FUNCTIONS_LOADED'))
+			require FORUM_ROOT.'include/cache.php';
+		
+		generate_forum_cache();
 
 		redirect('backstage/board.php?edit_forum='.$forum_id);
 	}
@@ -187,11 +217,7 @@ elseif (isset($_POST['update_positions'])) {
 <form id="edit_forum" class="form-horizontal" method="post" action="board.php?edit_forum=<?php echo $forum_id ?>">
 	<div class="panel panel-default">
 		<div class="panel-heading">
-<<<<<<< HEAD
-			<h3 class="panel-title"><?php echo $lang['Edit details subhead'] ?><span class="pull-right"><button class="btn btn-primary" type="submit" name="save"><span class="fa fa-fw fa-check"></span> <?php echo $lang['Save'] ?></button></span></h3>
-=======
-			<h3 class="panel-title"><?php _e('Edit forum details', 'luna') ?><span class="pull-right"><input class="btn btn-primary" type="submit" name="save" value="<?php _e('Save', 'luna') ?>" tabindex="<?php echo $cur_index++ ?>" /></span></h3>
->>>>>>> lunadev
+			<h3 class="panel-title"><?php _e('Forum details', 'luna') ?><span class="pull-right"><button class="btn btn-primary" type="submit" name="save"><span class="fa fa-fw fa-check"></span> <?php _e('Save', 'luna') ?></button></span></h3>
 		</div>
 		<div class="panel-body">
 			<fieldset>
@@ -313,11 +339,7 @@ elseif (isset($_POST['update_positions'])) {
 	</div>
 	<div class="panel panel-default">
 		<div class="panel-heading">
-<<<<<<< HEAD
-			<h3 class="panel-title"><?php echo $lang['Group permissions subhead'] ?><span class="pull-right"><button class="btn btn-primary" type="submit" name="save"><span class="fa fa-fw fa-check"></span> <?php echo $lang['Save'] ?></button></span></h3>
-=======
-			<h3 class="panel-title"><?php _e('Edit group permissions', 'luna') ?><span class="pull-right"><input class="btn btn-primary" type="submit" name="save" value="<?php _e('Save', 'luna') ?>" tabindex="<?php echo $cur_index++ ?>" /></span></h3>
->>>>>>> lunadev
+			<h3 class="panel-title"><?php _e('Group permissions', 'luna') ?><span class="pull-right"><button class="btn btn-primary" type="submit" name="save"><span class="fa fa-fw fa-check"></span> <?php _e('Save', 'luna') ?></button></span></h3>
 		</div>
 		<fieldset>
 			<div class="panel-body">
@@ -625,11 +647,7 @@ while ($cur_forum = $db->fetch_assoc($result)) {
 
 ?>
 							<tr>
-<<<<<<< HEAD
-								<td class="col-xs-4"><div class="btn-group"><a class="btn btn-primary" href="board.php?edit_forum=<?php echo $cur_forum['fid'] ?>" tabindex="<?php echo $cur_index++ ?>"><span class="fa fa-fw fa-pencil-square-o"></span> <?php echo $lang['Edit'] ?></a><a class="btn btn-danger" href="board.php?del_forum=<?php echo $cur_forum['fid'] ?>" tabindex="<?php echo $cur_index++ ?>"><span class="fa fa-fw fa-trash"></span> <?php echo $lang['Remove'] ?></a></div></td>
-=======
-								<td class="col-xs-3"><div class="btn-group"><a class="btn btn-primary" href="board.php?edit_forum=<?php echo $cur_forum['fid'] ?>" tabindex="<?php echo $cur_index++ ?>"><span class="fa fa-fw fa-pencil-square-o"></span> <?php _e('Edit', 'luna') ?></a><a class="btn btn-danger" href="board.php?del_forum=<?php echo $cur_forum['fid'] ?>" tabindex="<?php echo $cur_index++ ?>"><span class="fa fa-fw fa-trash"></span> <?php _e('Remove', 'luna') ?></a></div></td>
->>>>>>> lunadev
+								<td class="col-xs-4"><div class="btn-group"><a class="btn btn-primary" href="board.php?edit_forum=<?php echo $cur_forum['fid'] ?>" tabindex="<?php echo $cur_index++ ?>"><span class="fa fa-fw fa-pencil-square-o"></span> <?php _e('Edit', 'luna') ?></a><a class="btn btn-danger" href="board.php?del_forum=<?php echo $cur_forum['fid'] ?>" tabindex="<?php echo $cur_index++ ?>"><span class="fa fa-fw fa-trash"></span> <?php _e('Remove', 'luna') ?></a></div></td>
 								<td class="col-xs-4"><strong><?php echo luna_htmlspecialchars($cur_forum['forum_name']) ?></strong></td>
 								<td class="col-xs-4"><input type="text" class="form-control" name="position[<?php echo $cur_forum['fid'] ?>]" maxlength="3" value="<?php echo $cur_forum['disp_position'] ?>" tabindex="<?php echo $cur_index++ ?>" /></td>
 							</tr>

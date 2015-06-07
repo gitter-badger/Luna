@@ -1336,10 +1336,11 @@ function maintenance_message() {
 	// Send the Content-type header in case the web server is setup to send something else
 	header('Content-type: text/html; charset=utf-8');
 
-	// Deal with newlines, tabs and multiple spaces
-	$message = $luna_config['o_maintenance_message'];
+	// Include functions
+	require FORUM_ROOT.'include/draw_functions.php';
 
-	require load_page('maintenance.php');
+	// Show the page
+	draw_wall_error($luna_config['o_maintenance_message'], NULL, __('Maintenance', 'luna'));
 
 	// End the transaction
 	$db->end_transaction();
@@ -2092,6 +2093,50 @@ function load_css() {
 }
 
 //
+// Get the meta tags that are required
+//
+function load_meta() {
+	global $id, $page_title, $p, $luna_config;
+
+	// We need these tags no matter what
+	echo '<title>'.generate_page_title($page_title, $p).'</title>'."\n";
+	echo '<meta charset="utf-8">'."\n";
+	echo '<meta http-equiv="X-UA-Compatible" content="IE=edge">'."\n";
+	echo '<meta name="viewport" content="width=device-width, initial-scale=1.0">'."\n";
+
+	// Allow childs
+	load_css();
+	
+	if (!empty($luna_config['o_board_tags']))
+		echo '<meta name="keywords" content="'.$luna_config['o_board_tags'].'">'."\n";
+	if (!defined('FORUM_ALLOW_INDEX'))
+		echo '<meta name="ROBOTS" content="NOINDEX, FOLLOW" />'."\n";
+	if (defined('FORUM_CANONICAL_TAG_TOPIC'))
+		echo '<link rel="canonical" href="/viewtopic.php?id='.$id.'" />'."\n";
+	if (defined('FORUM_CANONICAL_TAG_FORUM'))
+		echo '<link rel="canonical" href="/viewforum.php?id='.$id.'" />'."\n";
+
+	// Required fields check
+	required_fields();
+}
+
+//
+// Check wheter or not to enable night mode
+//
+function check_night_mode() {
+	global $luna_user;
+
+	$hour = date('G', time());
+	
+	if ($luna_user['adapt_time'] == 1 || (($luna_user['adapt_time'] == 2) && (($hour <= 7) || ($hour >= 19))))
+		$body_classes .= ' night';
+	else
+		$body_classes .= ' normal';
+
+	return $body_classes;
+}
+
+//
 // Delete all content in a folder
 //
 function delete_all($path) {
@@ -2142,7 +2187,7 @@ function validate_redirect($redirect_url, $fallback_url) {
 	if (!isset($valid['path']))
 		$valid['path'] = '';
 
-	if ($referrer['host'] == $valid['host'] && preg_match('%^'.preg_quote($valid['path'], '%').'/(.*?)\.php%i', $referrer['path']))
+	if ($referrer['host'] == $valid['host'] && preg_match('%^'.preg_quote($valid['path'], '%').'/(.*?)\.php%i', $referrer['path']) && (strpos($redirect_url, 'login.php') === false))
 		return $redirect_url;
 	else
 		return $fallback_url;
