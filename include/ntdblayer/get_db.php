@@ -23,6 +23,10 @@ switch ($db_type) {
 		require_once FORUM_ROOT.'include/ntdblayer/db_mysqli_innodb.php';
 		break;
 
+	case 'sqlite':
+		require_once FORUM_ROOT.'include/ntdblayer/db_sqlite.php';
+		break;
+
 	case 'pgsql':
 		require_once FORUM_ROOT.'include/ntdblayer/db_pgsql.php';
 		break;
