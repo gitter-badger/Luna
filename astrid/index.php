@@ -43,7 +43,7 @@
 				</div>
 			</div>
 		</nav>
-		<div class="container-fluid">
+		<div class="container container-content">
 			<div class="row">
 				<div class="col-xs-3 col-sm-3 col-md-2 col-no-padding sidebar">
 					<div class="list-group">

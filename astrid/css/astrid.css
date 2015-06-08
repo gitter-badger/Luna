@@ -5,6 +5,12 @@
  */
 
 /****************************************
+ * Dependencies
+ ***************************************/
+
+@import url(//fonts.googleapis.com/css?family=Open+Sans:400,300);
+
+/****************************************
  * General fixes
  ***************************************/
 
@@ -13,7 +19,7 @@
  * Fonts
  ***************************************/
 body {
-	font-family: "Segoe UI", open-sanse;
+	font-family: "Segoe UI", "Open Sans", Helvetica, Arial, sans-serif;
 }
 
 .h1, h1 {
@@ -25,12 +31,15 @@ body {
 }
 
 h1, h2, h3, h4, h5, h6, h3.panel-title {
-	font-family: "Segoe UI Light", "Segoe UI", open-sanse;
+	font-family: "Segoe UI Semilight", "Segoe UI", "Open Sans", Helvetica, Arial, sans-serif;
 }
  
 /****************************************
  * General interface
  ***************************************/
+body {
+	background-color: #313131;
+}
 
 /* Navbar */
 .navbar {
@@ -68,6 +77,11 @@ h1, h2, h3, h4, h5, h6, h3.panel-title {
 
 .navbar-default .navbar-toggle:focus, .navbar-default .navbar-toggle:hover {
     background-color: #2788cb;
+}
+
+/* Container */
+.container-content {
+	background-color: #fff;
 }
 
 /* Sidebar */
