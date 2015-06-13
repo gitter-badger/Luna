@@ -38,7 +38,7 @@ h1, h2, h3, h4, h5, h6, h3.panel-title {
  * General interface
  ***************************************/
 body {
-	background-color: #313131;
+	background-color: #e8e8e8;
 }
 
 /* Navbar */
@@ -55,8 +55,15 @@ body {
 	box-shadow: 0px 0px 20px rgba(0,0,0,0.2);
 }
 
-.navbar-default .container {
+@media all and (min-width:768px) {
+	.navbar-default .container {
+		padding-left: 0;
 	padding-right: 0;
+	}
+
+	.navbar-default .navbar-collapse {
+		padding-left: 0;
+	}
 }
 
 .navbar-default .navbar-brand {
@@ -144,9 +151,9 @@ body {
 }
 
 .nav-tabs > li.active > a, .nav-tabs > li.active > a:hover, .nav-tabs > li.active > a:focus {
-	color: #fff;
-	background-color: #313131;
-	border-color: #313131;
+	color: #333;
+	background-color: #e8e8e8;
+	border-color: #e8e8e8;
 }
 
 .nav-tabs > li > a:hover, .nav > li > a:hover, .nav > li > a:focus {
@@ -202,15 +209,13 @@ body {
 
 .panel-default > .panel-heading {
 	border-radius: 0;
-	background-color: #555;
+	background-color: #2788cb;
+	border-color: #2788cb;
 	color: #fff;
 }
 
 .panel-default > .panel-body, .panel-default > .table {
-	border-radius: 0;
-	border-width: 0 1px 1px 1px;
-	border-style: none solid solid solid;
-	border-color: #eee #eee #eee #eee;
+	border: none;
 }
 
 /****************************************
