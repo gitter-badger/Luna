@@ -32,7 +32,7 @@
 					</ul>
 					<ul class="nav navbar-nav navbar-right">
 						<li class="dropdown">
-							<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Astrid <i class="fa fa-fw fa-angle-down"></i></a>
+							<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false"><i class="fa fa-fw fa-angle-down"></i><span class="visible-xs-inline"> Astrid</span></a>
 							<ul class="dropdown-menu" role="menu">
 								<li><a href="#">Profile</a></li>
 								<li><a href="#">Settings</a></li>
@@ -52,7 +52,7 @@
 				<div class="row">
 					<h2 class="hidden-xs">
 						<i class="fa fa-fw fa-dashboard"></i> Welcome back, Astrid!
-						<span class="pull-right" style="font-size: 70%;">Core 1.9.4712</span>
+						<span class="pull-right" style="font-size: 70%;">Core 2.0.0.39</span>
 					</h2>
 					<ul class="nav nav-tabs" role="tablist">
 						<li class="active"><a href="index.php"><i class="fa fa-fw fa-tachometer"></i><span class="hidden-xs"> Backstage</span></a></li>
