@@ -223,13 +223,12 @@ body {
  ***************************************/
 .widget .widget-heading {
 	padding: 10px;
-	background-color: #555;
+	background-color: #2788cb;
 	color: #fff;
 }
 
 .widget .widget-heading h2 {
 	margin: 17px 10px 7px 10px;
-	background-color: #555;
 	color: #fff;
 }
 
