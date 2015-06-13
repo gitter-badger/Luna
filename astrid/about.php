@@ -1,4 +1,8 @@
-<?php include('include/header.php') ?>
+<?php
+include('include/header.php');
+
+draw_astrid_nav('about', 'backstage');
+?>
 <div class="row">
 	<div class="col-sm-3">
 		<div class="panel panel-default">

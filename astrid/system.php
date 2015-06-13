@@ -1,4 +1,8 @@
-<?php include('include/header.php') ?>
+<?php
+include('include/header.php');
+
+draw_astrid_nav('system', 'backstage');
+?>
 <div class="panel panel-default">
 	<div class="panel-heading">
 		<h3 class="panel-title">Luna version information</h3>
