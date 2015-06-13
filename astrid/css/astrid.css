@@ -75,9 +75,10 @@ body {
 	color: #fff;
 }
 
-.navbar-default .navbar-nav > .open > a, .navbar-default .navbar-nav > .open > a:focus, .navbar-default .navbar-nav > .open > a:hover {
+.navbar-default .navbar-nav > .active > a, .navbar-default .navbar-nav > .active > a:focus, .navbar-default .navbar-nav > .active > a:hover, .navbar-default .navbar-nav > .open > a, .navbar-default .navbar-nav > .open > a:focus, .navbar-default .navbar-nav > .open > a:hover {
     color: #fff;
     background-color: #2788cb;
+	text-shadow: 0 0 5px 1px rgba(255, 255, 255, .5);
 }
 
 .navbar-default .navbar-collapse, .navbar-default .navbar-form {
