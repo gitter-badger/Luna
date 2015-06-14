@@ -174,10 +174,7 @@ lang/luna.mo
 ## Luna files
 #############
 
-backstage/.updatelog
 cache/
 config.php
-edge/
 img/avatars/
 install/
-temp/
