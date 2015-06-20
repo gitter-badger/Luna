@@ -25,4 +25,7 @@ if ( !defined( 'JEWEL' ) ) {
 // Load the datbase layer,  and connect
 require JEWEL_ROOT.'/include/jeweldblayer/get_db.php';
 
+// Connect to the database
+$db->start_connection();
+
 ?>
