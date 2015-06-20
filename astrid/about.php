@@ -35,20 +35,13 @@ draw_astrid_nav('about', 'backstage');
 						<h4>Database layer</h4>
 						<p>The database layers have been rewritten to include new functions that make our codebase smaller and other performance improvements and APIs for developers.</p>
 					</div>
-					<div class="col-sm-6">
-						<h4>SQLite 3</h4>
-						<p>Luna finally supports SQLite 3 as of version 2.0. If you have a system with SQLite 3-support and you want Luna on that system, here's your time!</p>
-					</div>
 				</div>
 				<a id="others"></a><h3>Other improvements and notes</h3>
 				<div class="row">
-					<div class="col-sm-12">
-						<h4>And a lot of other small changes</h4>
-						<p>However, since Luna 1.1 has its focus on refinements, there are also a lot of other small improvements all over the board (no pun intended). This includes better performance, more developer options, small visual changes and fixes, and so much more.</p>
-					</div>
 					<div class="col-sm-6">
 						<h4>Packages</h4>
-						<p><b>Core</b> has been updated from version 1.1.4719 to 2.0.0.39..</p>
+						<p><b>Core</b> version 1.1.4755 has been removed.<br />
+						<b>Jewel</b> version 2.0.0.59 has been added.<br /></p>
 					</div>
 					<div class="col-sm-6">
 						<h4>Bug fixes</h4>

@@ -1,6 +1,12 @@
 
 							<ul id="navmenu" class="nav navbar-nav navbar-right">
 <?php
+if (!empty($items['astrid'])) {
+	$item = $items['astrid'];
+?>
+								<li id="navastrid"><a href="<?php echo $item['url']; ?>"><span class="fa fa-fw fa-cogs"></span><span class="visible-xs-inline"> <?php echo $item['title']; ?></span></a></li>
+<?php
+}
 if (!empty($items['backstage'])) {
 	$item = $items['backstage'];
 ?>

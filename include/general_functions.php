@@ -35,6 +35,13 @@ function get_user_nav_menu_items() {
 	} else {
 
 		if ($luna_user['is_admmod']) {
+			$items['astrid'] = array(
+				'url'   => 'astrid/',
+				'title' => __('Astrid', 'luna'),
+			);
+		}
+
+		if ($luna_user['is_admmod']) {
 			$items['backstage'] = array(
 				'url'   => 'backstage/',
 				'title' => __('Backstage', 'luna'),
