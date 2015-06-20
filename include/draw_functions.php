@@ -425,7 +425,7 @@ function draw_subforum_list($object_name = 'forum.php') {
 			$forum_field = '<a href="viewforum.php?id='.$cur_forum['fid'].'">'.luna_htmlspecialchars($cur_forum['forum_name']).'</a>'.(!empty($forum_field_new) ? ' '.$forum_field_new : '');
 		
 			if ($cur_forum['forum_desc'] != '')
-				$forum_desc = '<div class="forum-description">'.luna_htmlspecialchars($cur_forum['forum_desc']).'</div>';
+				$forum_desc = '<div class="forum-description">'.$cur_forum['forum_desc'].'</div>';
 		
 			$topics_label = __('topic', 'topics', $cur_forum['num_topics'], 'luna');
 			$posts_label = __('post', 'posts', $cur_forum['num_posts'], 'luna');
@@ -451,6 +451,7 @@ function draw_index_topics_list() {
 			$topic_ids[] = $cur_topic_id;
 
 		// Fetch list of topics to display on this page
+		$sql_soft = NULL;
 		if ($luna_user['is_guest'] || $luna_config['o_has_posted'] == '0') {
 			if (!$luna_user['g_soft_delete_view'])
 				$sql_soft = 'soft = 0 AND ';
@@ -676,14 +677,11 @@ function draw_comment_list() {
 				if (($cur_topic['post_replies'] == 0 && $luna_user['g_post_replies'] == 1) || $cur_topic['post_replies'] == 1)
 					$post_actions[] = '<a href="post.php?tid='.$id.'&amp;qid='.$cur_post['id'].'">'.__('Quote', 'luna').'</a>';
 			}
-			
-			if ($luna_user['username'] == $started_by)
-				$post_actions[] = '<a href="post.php?tid='.$id.'&amp;qid='.$cur_post['id'].'">'.__('Answer', 'luna').'</a>';
 		} else {
 			if ($cur_post['marked'] == false)
 				$post_actions[] = '<a href="misc.php?report='.$cur_post['id'].'">'.__('Report', 'luna').'</a>';
 			else
-				$post_actions[] = '<a class="reported" disabled="disabled" href="misc.php?report='.$cur_post['id'].'">'.__('Report', 'luna').'</a>';
+				$post_actions[] = '<a disabled="disabled" href="misc.php?report='.$cur_post['id'].'">'.__('Report', 'luna').'</a>';
 
 			if ($luna_user['g_id'] == FORUM_ADMIN || !in_array($cur_post['poster_id'], $admin_ids)) {
 				$post_actions[] = '<a href="delete.php?id='.$cur_post['id'].'&action=delete">'.__('Delete', 'luna').'</a>';
@@ -694,7 +692,6 @@ function draw_comment_list() {
 				$post_actions[] = '<a href="edit.php?id='.$cur_post['id'].'">'.__('Edit', 'luna').'</a>';
 			}
 			$post_actions[] = '<a href="post.php?tid='.$id.'&amp;qid='.$cur_post['id'].'">'.__('Quote', 'luna').'</a>';
-			$post_actions[] = '<a href="post.php?tid='.$id.'&amp;qid='.$cur_post['id'].'">'.__('Answer', 'luna').'</a>';
 		}
 	
 		// Perform the main parsing of the message (BBCode, smilies, censor words etc)
