@@ -1,7 +1,7 @@
 <?php
 include('include/header.php');
 
-draw_astrid_nav('system', 'backstage');
+Astrid::DrawAstridNav( 'system', 'backstage' );
 ?>
 <div class="panel panel-default">
 	<div class="panel-heading">

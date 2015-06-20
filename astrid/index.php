@@ -1,7 +1,7 @@
 <?php
-include('include/header.php');
+include( 'include/header.php' );
 
-draw_astrid_nav('backstage', 'backstage');
+Astrid::DrawAstridNav( 'backstage', 'backstage' );
 ?>
 <div class="row">
 	<div class="col-sm-7">
