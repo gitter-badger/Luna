@@ -17,12 +17,13 @@ header('Content-type: text/html; charset=utf-8');
 
 // Load the functions script
 require FORUM_ROOT.'include/functions.php';
+require FORUM_ROOT.'include/draw_functions.php';
 
 // Load Version class
 require FORUM_ROOT.'include/version.php';
 
 // Load Installer class
-require FORUM_ROOT.'include/install.php';
+require FORUM_ROOT.'include/class/luna_install.php';
 
 // Load UTF-8 functions
 require FORUM_ROOT.'include/utf8/utf8.php';
@@ -67,23 +68,29 @@ $install_lang = isset($_REQUEST['install_lang']) ? luna_trim($_REQUEST['install_
 // Make sure we got a valid language string 
 $install_lang = preg_replace('%[\.\\\/]%', '', $install_lang); 
 
-// If such a language pack doesn't exist, or isn't up-to-date enough to translate this page, default to English
-if (!file_exists(FORUM_ROOT.'lang/'.$install_lang.'/luna.mo'))
-	$install_lang = Installer::DEFAULT_LANG;
+// Load l10n
+require_once FORUM_ROOT.'include/pomo/MO.php';
+require_once FORUM_ROOT.'include/l10n.php';
 
-require FORUM_ROOT.'lang/'.$install_lang.'/luna.mo';
+// Attempt to load the language file
+if (file_exists(FORUM_ROOT.'lang/English/luna.mo'))
+	load_textdomain('luna', FORUM_ROOT.'lang/English/luna.mo');
+else
+	error('There is no valid language pack \''.luna_htmlspecialchars($luna_user['language']).'\' installed. Please reinstall a language of that name');
 
+// If a config file is in place
 if (file_exists(FORUM_ROOT.'config.php')) {
 	// Check to see whether Luna is already installed
 	include FORUM_ROOT.'config.php';
 
-	// This fixes incorrect defined PUN, FluxBB 1.4 and 1.5 and Luna 1.6
+	// This fixes incorrect defined PUN, FluxBB 1.4 and 1.5 and ModernBB 1.6
 	if (defined('PUN'))
 		define('FORUM', PUN);
 
 	// If FORUM is defined, config.php is probably valid and thus the software is installed
 	if (defined('FORUM'))
-		exit(__('It seems like Luna is already installed. You should go <a href="index.php">here</a> instead.', 'luna'));
+		draw_wall_error(__('It seems like Luna is already installed.', 'luna'), '<a class="btn btn-default" href="index.php">Continue</a>', __('Let\'s get started', 'luna'));
+		exit;
 }
 
 // Define FORUM because email.php requires it

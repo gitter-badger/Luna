@@ -159,13 +159,15 @@ if (!defined('FORUM'))
 							<div class="radio">
 								<label>
 									<input type="radio" name="form[adapt_time]" value="2"<?php if ($user['adapt_time'] == '2') echo ' checked' ?> />
+									Enable night mode automatically
 								</label>
 							</div>
 						</div>
 					</div>
+<?php if ($luna_user['is_admmod']) { ?>
 					<hr />
 					<div class="form-group">
-						<label class="col-sm-3 control-label">Backstage<?php _e('Color', 'luna') ?></label>
+						<label class="col-sm-3 control-label"><?php _e('Backstage accent', 'luna') ?></label>
 						<div class="col-sm-9">
 							<div class="btn-group accent-group" data-toggle="buttons">
 <?php
@@ -182,6 +184,7 @@ if (!defined('FORUM'))
 						</div>
 					</div>
 <?php
+}
 
 $languages = forum_list_langs();
 

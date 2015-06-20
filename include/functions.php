@@ -753,6 +753,8 @@ function delete_topic($topic_id, $type) {
 	// Make sure we have a list of post IDs
 	if ($post_ids != '') {
 		if ($type == "hard") {
+			decrease_post_counts($post_ids);
+
 			strip_search_index($post_ids);
 			// Delete posts in topic
 			$db->query('DELETE FROM '.$db->prefix.'posts WHERE topic_id='.$topic_id) or error('Unable to delete posts', __FILE__, __LINE__, $db->error());
@@ -774,7 +776,7 @@ function delete_topic($topic_id, $type) {
 //
 // Delete a single post
 //
-function delete_post($post_id, $topic_id) {
+function delete_post($post_id, $topic_id, $poster_id) {
 	global $db;
 
 	$result = $db->query('SELECT id, poster, posted FROM '.$db->prefix.'posts WHERE topic_id='.$topic_id.' ORDER BY id DESC LIMIT 2') or error('Unable to fetch post info', __FILE__, __LINE__, $db->error());
@@ -783,6 +785,10 @@ function delete_post($post_id, $topic_id) {
 
 	// Delete the post
 	$db->query('DELETE FROM '.$db->prefix.'posts WHERE id='.$post_id) or error('Unable to delete post', __FILE__, __LINE__, $db->error());
+
+	// Decrement user post count if the user is a registered user
+	if ($poster_id > 1)
+		$db->query('UPDATE '.$db->prefix.'users SET num_posts=num_posts-1 WHERE id='.$poster_id.' AND num_posts>0') or error('Unable to update user post count', __FILE__, __LINE__, $db->error());
 
 	strip_search_index($post_id);
 
@@ -1336,10 +1342,11 @@ function maintenance_message() {
 	// Send the Content-type header in case the web server is setup to send something else
 	header('Content-type: text/html; charset=utf-8');
 
-	// Deal with newlines, tabs and multiple spaces
-	$message = $luna_config['o_maintenance_message'];
+	// Include functions
+	require FORUM_ROOT.'include/draw_functions.php';
 
-	require load_page('maintenance.php');
+	// Show the page
+	draw_wall_error($luna_config['o_maintenance_message'], NULL, __('Maintenance', 'luna'));
 
 	// End the transaction
 	$db->end_transaction();
@@ -2054,7 +2061,7 @@ function get_view_path($object) {
 function load_page($page) {
 	global $luna_user, $luna_config;
 	
-	include FORUM_ROOT.'/themes/'.$luna_config['o_default_style'].'/information.php';
+	include FORUM_ROOT.'themes/'.$luna_config['o_default_style'].'/information.php';
 	$theme_info = new SimpleXMLElement($xmlstr);
 	
 	if (($theme_info->parent_theme == '') || (file_exists(FORUM_ROOT.'themes/'.$luna_config['o_default_style'].'/'.$page)))
@@ -2072,23 +2079,73 @@ function load_css() {
 	include FORUM_ROOT.'/themes/'.$luna_config['o_default_style'].'/information.php';
 	$theme_info = new SimpleXMLElement($xmlstr);
 	
+	// If there is a parent theme, we need to load its CSS too
 	if ($theme_info->parent_theme != '') {
-		echo '<link rel="stylesheet" type="text/css" href="themes/'.$theme_info->parent_theme.'/style.css" />';
+		echo '<link rel="stylesheet" type="text/css" href="themes/'.$theme_info->parent_theme.'/style.css" />'."\n";
+		
+		// Also load a color scheme
 		if (file_exists('themes/'.$theme_info->parent_theme.'/accents/'.$luna_user['color_scheme'].'.css')) {
 			if ($luna_user['is_guest'])
-				echo '<link rel="stylesheet" type="text/css" href="themes/'.$luna_config['o_default_style'].'/accents/'.$luna_config['o_default_accent'].'.css" />';
+				echo '<link rel="stylesheet" type="text/css" href="themes/'.$theme_info->parent_theme.'/accents/'.$luna_config['o_default_accent'].'.css" />'."\n";
 			else
-				echo '<link rel="stylesheet" type="text/css" href="themes/'.$theme_info->parent_theme.'/accents/'.$luna_user['color_scheme'].'.css" />';
+				echo '<link rel="stylesheet" type="text/css" href="themes/'.$theme_info->parent_theme.'/accents/'.$luna_user['color_scheme'].'.css" />'."\n";
 		}
 	}
+	
+	// Load the themes actual CSS
+	echo '<link rel="stylesheet" type="text/css" href="themes/'.$luna_config['o_default_style'].'/style.css" />'."\n";
 
-	echo '<link rel="stylesheet" type="text/css" href="themes/'.$luna_config['o_default_style'].'/style.css" />';
+	// And load its color scheme
 	if (file_exists('themes/'.$luna_config['o_default_style'].'/accents/'.$luna_user['color_scheme'].'.css')) {
 		if ($luna_user['is_guest'])
-			echo '<link rel="stylesheet" type="text/css" href="themes/'.$luna_config['o_default_style'].'/accents/'.$luna_config['o_default_accent'].'.css" />';
+			echo '<link rel="stylesheet" type="text/css" href="themes/'.$luna_config['o_default_style'].'/accents/'.$luna_config['o_default_accent'].'.css" />'."\n";
 		else
-			echo '<link rel="stylesheet" type="text/css" href="themes/'.$luna_config['o_default_style'].'/accents/'.$luna_user['color_scheme'].'.css" />';
+			echo '<link rel="stylesheet" type="text/css" href="themes/'.$luna_config['o_default_style'].'/accents/'.$luna_user['color_scheme'].'.css" />'."\n";
 	}
+}
+
+//
+// Get the meta tags that are required
+//
+function load_meta() {
+	global $id, $page_title, $p, $luna_config;
+
+	// We need these tags no matter what
+	echo '<title>'.generate_page_title($page_title, $p).'</title>'."\n";
+	echo '<meta charset="utf-8">'."\n";
+	echo '<meta http-equiv="X-UA-Compatible" content="IE=edge">'."\n";
+	echo '<meta name="viewport" content="width=device-width, initial-scale=1.0">'."\n";
+
+	// Allow childs
+	load_css();
+	
+	if (!empty($luna_config['o_board_tags']))
+		echo '<meta name="keywords" content="'.$luna_config['o_board_tags'].'">'."\n";
+	if (!defined('FORUM_ALLOW_INDEX'))
+		echo '<meta name="ROBOTS" content="NOINDEX, FOLLOW" />'."\n";
+	if (defined('FORUM_CANONICAL_TAG_TOPIC'))
+		echo '<link rel="canonical" href="/viewtopic.php?id='.$id.'" />'."\n";
+	if (defined('FORUM_CANONICAL_TAG_FORUM'))
+		echo '<link rel="canonical" href="/viewforum.php?id='.$id.'" />'."\n";
+
+	// Required fields check
+	required_fields();
+}
+
+//
+// Check wheter or not to enable night mode
+//
+function check_night_mode() {
+	global $luna_user, $body_classes;
+
+	$hour = date('G', time());
+	
+	if ($luna_user['adapt_time'] == 1 || (($luna_user['adapt_time'] == 2) && (($hour <= 7) || ($hour >= 19))))
+		$body_classes .= ' night';
+	else
+		$body_classes .= ' normal';
+
+	return $body_classes;
 }
 
 //
@@ -2178,4 +2235,24 @@ function get_forum_id($post_id) {
 		return $row[0];
 	else
 		return false;
+}
+
+// Decrease user post counts (used before deleting posts)
+function decrease_post_counts($post_ids) {
+	global $db;
+
+	// Count the post counts for each user to be subtracted
+	$user_posts = array();
+	$result = $db->query('SELECT poster_id FROM '.$db->prefix.'posts WHERE id IN('.$post_ids.') AND poster_id>1') or error('Unable to fetch posts', __FILE__, __LINE__, $db->error());
+	while ($row = $db->fetch_assoc($result))
+	{
+		if (!isset($user_posts[$row['poster_id']]))
+			$user_posts[$row['poster_id']] = 1;
+		else
+			++$user_posts[$row['poster_id']];
+	}
+
+	// Decrease the post counts
+	foreach($user_posts as $user_id => $subtract)
+		$db->query('UPDATE '.$db->prefix.'users SET num_posts = CASE WHEN num_posts>='.$subtract.' THEN num_posts-'.$subtract.' ELSE 0 END WHERE id='.$user_id) or error('Unable to update user post count', __FILE__, __LINE__, $db->error());
 }
