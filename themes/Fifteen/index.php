@@ -9,7 +9,7 @@ if ($luna_user['first_run'] == '0') {
 <div class="first-run panel panel-default">
 	<div class="row first-run-content">
 		<div class="col-md-4 col-sm-6 col-xs-5 first-run-profile">
-			<h3 class="first-run-title"><?php echo sprintf(__('Hi there, %s', 'luna'), luna_htmlspecialchars($luna_user['username'])) ?></h3>
+			<h3 class="first-run-title"><span class="hidden-xs"><?php echo sprintf(__('Hi there, %s', 'luna'), luna_htmlspecialchars($luna_user['username'])) ?></span><span class="visible-xs-block"><?php echo luna_htmlspecialchars($luna_user['username']) ?></span></h3>
 			<span class="first-run-avatar thumbnail">
 				<?php echo $user_avatar ?>
 			</span>
@@ -29,14 +29,14 @@ if ($luna_user['first_run'] == '0') {
 		</div>
 		<?php } else { ?>
 		<?php $redirect_url = check_url(); ?>
-		<div class="col-md-4 hidden-sm">
+		<div class="col-md-4 hidden-sm hidden-xs">
 			<h3 class="first-run-forumtitle"><?php echo sprintf(__('Welcome to %s', 'luna'), $luna_config['o_board_title']) ?></h3>
 			<div class="list-group first-run-list">
 				<a href="register.php" class="list-group-item"><?php _e('Register', 'luna') ?></a>
 				<a href="#" data-toggle="modal" data-target="#reqpass" class="list-group-item"><?php _e('Forgotten password', 'luna') ?></a>
 			</div>
 		</div>
-		<div class="col-md-4 col-sm-6">
+		<div class="col-md-4 col-sm-6 col-xs-7">
 			<form class="form form-first-run" id="login" method="post" action="login.php?action=in" onsubmit="return process_form(this)">
 				<fieldset>
 					<h3><?php _e('Login', 'luna') ?></h3>
@@ -78,9 +78,10 @@ if ($luna_user['first_run'] == '0') {
 		</div>
 <?php
 	}
-
-	draw_section_info($id);
 ?>
+        <div class="alert alert-info alert-section alert-all">
+            <h3><?php _e('Recent activity', 'luna') ?></h3>
+        </div>
 		<div class="list-group list-group-topic">
 <?php
 			draw_index_topics_list();

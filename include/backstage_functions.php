@@ -19,7 +19,7 @@ function load_admin_nav($section, $page) {
 	elseif ($page == 'update')
 		$page_title = '<span class="fa fa-fw fa-cloud-upload"></span> '.__('Luna software update', 'luna');
 	elseif ($page == 'about')
-		$page_title = '<span class="luni luni-fw luni-logo"></span> '.__('About Luna', 'luna');
+		$page_title = '<span class="fa fa-fw fa-moon-o"></span> '.__('About Luna', 'luna');
 
 	elseif ($page == 'board')
 		$page_title = '<span class="fa fa-fw fa-sort-amount-desc"></span> '.__('Board', 'luna');
@@ -70,7 +70,6 @@ function load_admin_nav($section, $page) {
 		
 	else
 		$page_title = $page;
-
 ?>
 <nav class="navbar navbar-fixed-top navbar-default" role="navigation">
 	<div class="container">
@@ -86,10 +85,14 @@ function load_admin_nav($section, $page) {
 		<div class="navbar-collapse collapse">
 			<ul class="nav navbar-nav">
 				<li class="<?php if ($section == 'backstage') echo 'active'; ?>"><a href="index.php"><span class="fa fa-fw fa-dashboard"></span> <?php _e('Backstage', 'luna') ?></a></li>
-				<li class="<?php if ($section == 'content') echo 'active'; ?>"><a href="board.php"><span class="fa fa-fw fa-file"></span> <?php _e('Content', 'luna') ?></a></li>
+				<?php if ($is_admin) { ?>
+					<li class="<?php if ($section == 'content') echo 'active'; ?>"><a href="board.php"><span class="fa fa-fw fa-file"></span> <?php _e('Content', 'luna') ?></a></li>
+				<?php } else { ?>
+					<li class="<?php if ($section == 'content') echo 'active'; ?>"><a href="reports.php"><span class="fa fa-fw fa-file"></span> <?php _e('Content', 'luna') ?></a></li>
+				<?php } ?>
 				<li class="<?php if ($section == 'users') echo 'active'; ?>"><a href="users.php"><span class="fa fa-fw fa-users"></span> <?php _e('Users', 'luna') ?></a></li>
-				<li class="<?php if ($section == 'settings') echo 'active'; ?>"><a href="settings.php"><span class="fa fa-fw fa-cog"></span> <?php _e('Settings', 'luna') ?></a></li>
-				<li class="<?php if ($section == 'maintenance') echo 'active'; ?>"><a href="maintenance.php"><span class="fa fa-fw fa-coffee"></span> <?php _e('Maintenance', 'luna') ?></a></li>	
+				<?php if ($is_admin) { ?><li class="<?php if ($section == 'settings') echo 'active'; ?>"><a href="settings.php"><span class="fa fa-fw fa-cog"></span> <?php _e('Settings', 'luna') ?></a></li><?php } ?>
+				<?php if ($is_admin) { ?><li class="<?php if ($section == 'maintenance') echo 'active'; ?>"><a href="maintenance.php"><span class="fa fa-fw fa-coffee"></span> <?php _e('Maintenance', 'luna') ?></a></li>	<?php } ?>
 <?php
 
 	// See if there are any plugins
@@ -146,7 +149,7 @@ function load_admin_nav($section, $page) {
 				<li<?php if($page == 'index') echo ' class="active"' ?>><a href="index.php"><span class="fa fa-fw fa-tachometer"></span><span class="hidden-xs"> <?php _e('Backstage', 'luna') ?></span></a></li>
 				<li<?php if($page == 'stats') echo ' class="active"' ?>><a href="system.php"><span class="fa fa-fw fa-info-circle"></span><span class="hidden-xs"> <?php _e('System info', 'luna') ?></span></a></li>
 				<li<?php if($page == 'update') echo ' class="active"' ?>><a href="update.php"><span class="fa fa-fw fa-cloud-upload"></span><span class="hidden-xs"> <?php _e('Update', 'luna') ?></span></a></li>
-				<li class="pull-right<?php if($page == 'about') echo ' active' ?>"><a href="about.php"><span class="luni luni-fw luni-logo"></span><span class="hidden-xs"> <?php _e('About', 'luna') ?></span></a></li>
+				<li class="pull-right<?php if($page == 'about') echo ' active' ?>"><a href="about.php"><span class="fa fa-fw fa-moon-o"></span><span class="hidden-xs"> <?php _e('About', 'luna') ?></span></a></li>
 			</ul>
 			<?php } if ($section == 'content') { ?>
 			<ul class="nav nav-tabs" role="tablist">
@@ -187,7 +190,14 @@ function load_admin_nav($section, $page) {
 <div class="content">
 	<div class="container">
 		<div class="row">
-
 <?php
 
+}
+
+function check_is_admin() {
+	global $luna_user;
+
+	$is_admin = $luna_user['g_id'] == FORUM_ADMIN ? true : false;
+	
+	return $is_admin;
 }

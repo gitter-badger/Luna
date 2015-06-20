@@ -141,7 +141,7 @@ if (isset($_POST['update_group_membership'])) {
 					if ($db->result($result2) == $cur_post['id'])
 						delete_topic($cur_post['topic_id']);
 					else
-						delete_post($cur_post['id'], $cur_post['topic_id']);
+						delete_post($cur_post['id'], $cur_post['topic_id'], $id);
 
 					update_forum($cur_post['forum_id']);
 				}
@@ -553,7 +553,7 @@ To change your email address, please visit the following page:
 			$email_button = '<span class="input-group-btn"><a class="btn btn-primary" href="#" data-toggle="modal" data-target="#newmail">'.__('Change email address', 'luna').'</a></span>';
 		} else {
 			$email_field = '<input type="text" class="form-control" name="req_email" value="'.$user['email'].'" maxlength="80" />';
-			$email_button = '<span class="input-group-btn"><a class="btn btn-danger disabled" href="#" data-toggle="modal" data-target="#newmail">Unverified</a></span>';
+			$email_button = '<span class="input-group-btn"><a class="btn btn-danger disabled" href="#" data-toggle="modal" data-target="#newmail">'.__('Unverified', 'luna').'</a></span>';
 		}
 	}
 	

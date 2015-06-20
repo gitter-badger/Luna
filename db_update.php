@@ -32,7 +32,7 @@ if (!function_exists('version_compare') || version_compare(PHP_VERSION, Version:
 if (file_exists(FORUM_ROOT.'config.php'))
 	include FORUM_ROOT.'config.php';
 
-// This fixes incorrect defined PUN, from FluxBB 1.5 and Luna 1.6
+// This fixes incorrect defined PUN, from FluxBB 1.5 and ModernBB 1.6
 if (defined('PUN'))
 	define('FORUM', PUN);
 
@@ -49,6 +49,7 @@ if (!defined('FORUM_DEBUG'))
 // Load the functions script
 require FORUM_ROOT.'include/functions.php';
 require FORUM_ROOT.'include/notifications.php';
+require FORUM_ROOT.'include/draw_functions.php';
 require FORUM_ROOT.'include/general_functions.php';
 
 // Load UTF-8 functions
@@ -152,13 +153,14 @@ if (isset($luna_config['o_database_revision']) && $luna_config['o_database_revis
 		isset($luna_config['o_searchindex_revision']) && $luna_config['o_searchindex_revision'] >= Version::FORUM_SI_VERSION &&
 		isset($luna_config['o_parser_revision']) && $luna_config['o_parser_revision'] >= Version::FORUM_PARSER_VERSION &&
 		array_key_exists('o_core_version', $luna_config) && version_compare($luna_config['o_core_version'], Version::FORUM_CORE_VERSION, '>=')) {
-	error(__('Your forum is already as up-to-date as this script can make it', 'luna'));
+	draw_wall_error(__('Your forum is already as up-to-date as this script can make it.', 'luna'), '<a class="btn btn-default" href="index.php">Continue</a>', __('Let\'s get started', 'luna'));
+	exit;
 }
 
 // Check style
 $default_style = $luna_config['o_default_style'];
 if (!file_exists(FORUM_ROOT.'themes/'.$default_style.'/style.css'))
-	$default_style = 'Luna';
+	$default_style = 'Fifteen';
 
 // Empty all output buffers and stop buffering
 while (@ob_end_clean());
@@ -182,7 +184,7 @@ if (empty($stage)) {
 	<head>
 		<meta charset="utf-8">
 		<title><?php _e('Maintenance', 'luna') ?></title>
-		<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+		<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
 		<link href="backstage/css/style.css" type="text/css" rel="stylesheet">
 	</head>
 	<body>
@@ -203,7 +205,7 @@ if (empty($stage)) {
 		<title>Luna &middot; <?php _e('Update', 'luna') ?></title>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<meta name="robots" content="noindex, nofollow">
-		<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+		<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
 		<link href="backstage/css/style.css" type="text/css" rel="stylesheet">
 	</head>
 	<body onload="document.getElementById('install').start.disabled=false;">
@@ -239,6 +241,173 @@ switch ($stage) {
 		// Change the default style if the old doesn't exist anymore
 		if (!file_exists(FORUM_ROOT.'themes/'.$luna_config['o_default_style'].'/style.css'))
 			$db->query('UPDATE '.$db->prefix.'config SET conf_value = \''.$db->escape($default_style).'\' WHERE conf_name = \'o_default_style\'') or error('Unable to update default style config', __FILE__, __LINE__, $db->error());
+			
+		// Legacy support: FluxBB 1.4
+		// Make the message field MEDIUMTEXT to allow proper conversion of 65535 character posts to UTF-8
+		$db->alter_field('posts', 'message', 'MEDIUMTEXT', true) or error('Unable to alter message field', __FILE__, __LINE__, $db->error());
+
+		// Insert new config option o_feed_ttl
+		if (!array_key_exists('o_feed_ttl', $luna_config))
+			$db->query('INSERT INTO '.$db->prefix.'config (conf_name, conf_value) VALUES (\'o_feed_ttl\', \'0\')') or error('Unable to insert config value \'o_feed_ttl\'', __FILE__, __LINE__, $db->error());
+
+		// Add the last_report_sent column to the users table and the g_report_flood column to the groups table
+		$db->add_field('users', 'last_report_sent', 'INT(10) UNSIGNED', true, null, 'last_email_sent') or error('Unable to add last_report_sent field', __FILE__, __LINE__, $db->error());
+		$db->add_field('groups', 'g_report_flood', 'SMALLINT(6)', false, 60, 'g_email_flood') or error('Unable to add g_report_flood field', __FILE__, __LINE__, $db->error());
+
+		// Set non-default g_send_email, g_flood_email and g_flood_report values properly
+		$db->query('UPDATE '.$db->prefix.'groups SET g_send_email = 0 WHERE g_id = 3') or error('Unable to update group email permissions', __FILE__, __LINE__, $db->error());
+		$db->query('UPDATE '.$db->prefix.'groups SET g_email_flood = 0 WHERE g_id IN (1,2,3)') or error('Unable to update group email permissions', __FILE__, __LINE__, $db->error());
+		$db->query('UPDATE '.$db->prefix.'groups SET g_email_flood = 0, g_report_flood = 0 WHERE g_id IN (1,2,3)') or error('Unable to update group email permissions', __FILE__, __LINE__, $db->error());
+
+		// Rename the subscription table
+		$db->rename_table('subscriptions', 'topic_subscriptions');
+
+		// if we don't have the forum_subscriptions table, create it
+		if (!$db->table_exists('forum_subscriptions'))
+		{
+			$schema = array(
+				'FIELDS'		=> array(
+					'user_id'		=> array(
+						'datatype'		=> 'INT(10) UNSIGNED',
+						'allow_null'	=> false,
+						'default'		=> '0'
+					),
+					'forum_id'		=> array(
+						'datatype'		=> 'INT(10) UNSIGNED',
+						'allow_null'	=> false,
+						'default'		=> '0'
+					)
+				),
+				'PRIMARY KEY'	=> array('user_id', 'forum_id')
+			);
+
+			$db->create_table('forum_subscriptions', $schema) or error('Unable to create forum subscriptions table', __FILE__, __LINE__, $db->error());
+		}
+
+		// Insert new config option o_forum_subscriptions
+		if (!array_key_exists('o_forum_subscriptions', $luna_config))
+			$db->query('INSERT INTO '.$db->prefix.'config (conf_name, conf_value) VALUES (\'o_forum_subscriptions\', \'1\')') or error('Unable to insert config value \'o_forum_subscriptions\'', __FILE__, __LINE__, $db->error());
+
+		// Rename config option o_subscriptions to o_topic_subscriptions
+		if (!array_key_exists('o_topic_subscriptions', $luna_config))
+			$db->query('UPDATE '.$db->prefix.'config SET conf_name=\'o_topic_subscriptions\' WHERE conf_name=\'o_subscriptions\'') or error('Unable to rename config value \'o_subscriptions\'', __FILE__, __LINE__, $db->error());
+
+		// For MySQL(i) without InnoDB, change the engine of the online table (for performance reasons)
+		if ($db_type == 'mysql' || $db_type == 'mysqli')
+			$db->query('ALTER TABLE '.$db->prefix.'online ENGINE = MyISAM') or error('Unable to change engine type of online table to MyISAM', __FILE__, __LINE__, $db->error());
+			
+		// Legacy support: FluxBB 1.5
+		$db->drop_field($db->prefix.'groups', 'g_promote_min_posts', 'INT(10) UNSIGNED', false, 0, 'g_user_title') or error('Unable to drop g_promote_min_posts field', __FILE__, __LINE__, $db->error());
+		$db->drop_field($db->prefix.'groups', 'g_promote_next_group', 'INT(10) UNSIGNED', false, 0, 'g_promote_min_posts') or error('Unable to drop g_promote_next_group field', __FILE__, __LINE__, $db->error());
+		$db->drop_field($db->prefix.'groups', 'g_post_links', 'TINYINT(1)', false, 0, 'g_delete_topics') or error('Unable to drop g_post_links field', __FILE__, __LINE__, $db->error());
+		$db->drop_field($db->prefix.'groups', 'g_mod_promote_users', 'TINYINT(1)', false, 0, 'g_mod_ban_users') or error('Unable to drop g_mod_ban_users field', __FILE__, __LINE__, $db->error());
+		if (!$db->table_exists('search_cache')) {
+			$schema = array(
+				'FIELDS'		=> array(
+					'id'			=> array(
+						'datatype'		=> 'SERIAL',
+						'allow_null'	=> false
+					),
+					'rank'			=> array(
+						'datatype'		=> 'VARCHAR(50)',
+						'allow_null'	=> false,
+						'default'		=> '\'\''
+					),
+					'min_posts'		=> array(
+						'datatype'		=> 'MEDIUMINT(8) UNSIGNED',
+						'allow_null'	=> false,
+						'default'		=> '0'
+					)
+				),
+				'PRIMARY KEY'	=> array('id')
+			);
+		
+			$db->create_table('ranks', $schema) or error('Unable to create ranks table', __FILE__, __LINE__, $db->error());
+		}
+		if (!array_key_exists('o_ranks', $luna_config))
+			$db->query('INSERT INTO '.$db->prefix.'config (conf_name, conf_value) VALUES (\'o_ranks\', \'1\')') or error('Unable to insert config value \'o_ranks\'', __FILE__, __LINE__, $db->error());
+
+		// Legacy support: ModernBB 1.6, 1.7, 2.0, 2.1, 2.2, 2.3, 3.0, 3.1, 3.2, 3.3, 3.4, 3.5, 3.6, 3.7 and 3.8
+		// Since 2.0-beta.1: Add the marked column to the posts table
+		$db->add_field('posts', 'marked', 'TINYINT(1)', false, 0, null) or error('Unable to add marked field', __FILE__, __LINE__, $db->error());
+
+		// Since 2.0-beta.3: Remove obsolete o_quickjump permission from config table
+		if (array_key_exists('o_quickjump', $luna_config))
+			$db->query('DELETE FROM '.$db->prefix.'config WHERE conf_name = \'o_quickjump\'') or error('Unable to remove config value \'o_quickjump\'', __FILE__, __LINE__, $db->error());
+
+		// Since 2.0-rc.1: Remove obsolete o_show_dot permission from config table
+		if (array_key_exists('o_show_dot', $luna_config))
+			$db->query('DELETE FROM '.$db->prefix.'config WHERE conf_name = \'o_show_dot\'') or error('Unable to remove config value \'o_show_dot\'', __FILE__, __LINE__, $db->error());
+
+		// Since 3.2-alpha: Add the first_run column to the users table
+		$db->add_field('users', 'first_run', 'TINYINT(1)', false, 0) or error('Unable to add first_run field', __FILE__, __LINE__, $db->error());
+
+		// Since 3.2-alpha: Insert new config option o_show_first_run
+		if (!array_key_exists('o_show_first_run', $luna_config))
+			$db->query('INSERT INTO '.$db->prefix.'config (conf_name, conf_value) VALUES (\'o_show_first_run\', \'1\')') or error('Unable to insert config value \'o_show_first_run\'', __FILE__, __LINE__, $db->error());
+
+		// Since 3.2-alpha: Insert new config option o_first_run_guests
+		if (!array_key_exists('o_first_run_guests', $luna_config))
+			$db->query('INSERT INTO '.$db->prefix.'config (conf_name, conf_value) VALUES (\'o_first_run_guests\', \'1\')') or error('Unable to insert config value \'o_first_run_guests\'', __FILE__, __LINE__, $db->error());
+
+		// Since 3.2-alpha: Insert new config option o_first_run_message
+		if (!array_key_exists('o_first_run_message', $luna_config))
+			$db->query('INSERT INTO '.$db->prefix.'config (conf_name, conf_value) VALUES (\'o_first_run_message\', \'\')') or error('Unable to insert config value \'o_first_run_message\'', __FILE__, __LINE__, $db->error());
+
+		// Since 3.2-alpha: Remove obsolete o_redirect_delay permission from config table
+		if (array_key_exists('o_redirect_delay', $luna_config))
+			$db->query('DELETE FROM '.$db->prefix.'config WHERE conf_name = \'o_redirect_delay\'') or error('Unable to remove config value \'o_redirect_delay\'', __FILE__, __LINE__, $db->error());
+
+		// Since 3.2-beta: Add o_has_posted
+		if (!array_key_exists('o_has_posted', $luna_config))
+			$db->query('INSERT INTO '.$db->prefix.'config (conf_name, conf_value) VALUES (\'o_has_posted\', \'1\')') or error('Unable to insert config value \'o_has_posted\'', __FILE__, __LINE__, $db->error());
+
+		// Since 3.3-alpha: Add o_enable_advanced_search
+		if (!array_key_exists('o_enable_advanced_search', $luna_config))
+			$db->query('INSERT INTO '.$db->prefix.'config (conf_name, conf_value) VALUES (\'o_enable_advanced_search\', \'1\')') or error('Unable to insert config value \'o_enable_advanced_search\'', __FILE__, __LINE__, $db->error());
+
+		// Since 3.3-beta: Drop the backstage_style column from the forums table
+		$db->drop_field('users', 'backstage_style', 'INT', true, 0) or error('Unable to drop backstage_style field', __FILE__, __LINE__, $db->error());
+
+		// Since 3.4-rc: Insert new config option o_cookie_bar
+		if (!array_key_exists('o_cookie_bar', $luna_config))
+			$db->query('INSERT INTO '.$db->prefix.'config (conf_name, conf_value) VALUES (\'o_cookie_bar\', \'0\')') or error('Unable to insert config value \'o_cookie_bar\'', __FILE__, __LINE__, $db->error());
+
+		// Since 3.4-rc: Insert new config option o_moderated_by
+		if (!array_key_exists('o_moderated_by', $luna_config))
+			$db->query('INSERT INTO '.$db->prefix.'config (conf_name, conf_value) VALUES (\'o_moderated_by\', \'1\')') or error('Unable to insert config value \'o_moderated_by\'', __FILE__, __LINE__, $db->error());
+
+		// Since 3.4-rc: Make password field VARCHAR(256)
+		$db->alter_field('users', 'password', 'VARCHAR(256)', true) or error('Unable to alter password field', __FILE__, __LINE__, $db->error());
+
+		// Since 3.4-rc: Insert new config option video_width
+		if (!array_key_exists('o_video_width', $luna_config))
+			$db->query('INSERT INTO '.$db->prefix.'config (conf_name, conf_value) VALUES (\'o_video_width\', \'640\')') or error('Unable to insert config value \'o_video_width\'', __FILE__, __LINE__, $db->error());
+
+		// Since 3.4-rc: Insert new config option video_height
+		if (!array_key_exists('o_video_height', $luna_config))
+			$db->query('INSERT INTO '.$db->prefix.'config (conf_name, conf_value) VALUES (\'o_video_height\', \'360\')') or error('Unable to insert config value \'o_video_height\'', __FILE__, __LINE__, $db->error());
+
+		// Since 3.4.1: Drop the jabber column from the forums table
+		$db->drop_field('users', 'jabber') or error('Unable to drop jabber field', __FILE__, __LINE__, $db->error());
+
+		// Since 3.4.1: Drop the icq column from the forums table
+		$db->drop_field('users', 'icq') or error('Unable to drop icq field from user table', __FILE__, __LINE__, $db->error());
+
+		// Since 3.4.1: Drop the yahoo column from the forums table
+		$db->drop_field('users', 'yahoo') or error('Unable to drop yahoo field from user table', __FILE__, __LINE__, $db->error());
+
+		// Since 3.4.1: Drop the aim column from the forums table
+		$db->drop_field('users', 'aim') or error('Unable to drop aim field from user table', __FILE__, __LINE__, $db->error());
+
+		// Since 3.4.1: Add the facebook column to the users table
+		$db->add_field('users', 'facebook', 'VARCHAR(30)', true, null) or error('Unable to add facebook field to user table', __FILE__, __LINE__, $db->error());
+
+		// Since 3.4.1: Add the twitter column to the users table
+		$db->add_field('users', 'twitter', 'VARCHAR(30)', true, null) or error('Unable to add twitter field to user table', __FILE__, __LINE__, $db->error());
+
+		// Since 3.4.1: Add the google column to the users table
+		$db->add_field('users', 'google', 'VARCHAR(30)', true, null) or error('Unable to add google field to user table', __FILE__, __LINE__, $db->error());
 
 		// Since 3.5-beta: Remove obsolete o_antispam_api permission from config table
 		if (array_key_exists('o_antispam_api', $luna_config))
@@ -643,7 +812,7 @@ switch ($stage) {
 			$db->query('INSERT INTO '.$db->prefix.'config (conf_name, conf_value) VALUES (\'o_emoji\', \'0\')') or error('Unable to insert config value \'o_emoji\'', __FILE__, __LINE__, $db->error());
 
 		// Since 0.4.3861: Add the color_scheme column to the users table
-		$db->add_field('users', 'color_scheme', 'INT(25)', false, '3') or error('Unable to add column "color_scheme" to table "users"', __FILE__, __LINE__, $db->error());
+		$db->add_field('users', 'color_scheme', 'INT(25)', false, '2') or error('Unable to add column "color_scheme" to table "users"', __FILE__, __LINE__, $db->error());
 
 		// Since 0.4.3861: Drop the color column to the users table
 		$db->drop_field($db->prefix.'users', 'color', 'VARCHAR(25)', true, 0) or error('Unable to drop color field', __FILE__, __LINE__, $db->error());
@@ -657,7 +826,7 @@ switch ($stage) {
 			$db->query('INSERT INTO '.$db->prefix.'config (conf_name, conf_value) VALUES (\'o_update_ring\', \'1\')') or error('Unable to insert config value \'o_update_ring\'', __FILE__, __LINE__, $db->error());
 
 		// Since 0.9.4156: Add the color column to the forums table
-		$db->add_field('forums', 'color', 'VARCHAR(25)', false, '\'#0d4382\'') or error('Unable to add column "color" to table "forums"', __FILE__, __LINE__, $db->error());
+		$db->add_field('forums', 'color', 'VARCHAR(25)', false, '\'#2788cb\'') or error('Unable to add column "color" to table "forums"', __FILE__, __LINE__, $db->error());
 
 		// Since 0.9.4191: Remove obsolete o_quickpost permission from config table
 		if (array_key_exists('o_admin_notes', $luna_config))
@@ -668,14 +837,14 @@ switch ($stage) {
 			$db->query('DELETE FROM '.$db->prefix.'config WHERE conf_name = \'o_smilies\'') or error('Unable to remove config value \'o_smilies\'', __FILE__, __LINE__, $db->error());
 
 		// Since 1.1.4286: Add the accent column to the users table
-		$db->add_field('users', 'accent', 'INT(10)', false, '3') or error('Unable to add column "accent" to table "users"', __FILE__, __LINE__, $db->error());
+		$db->add_field('users', 'accent', 'INT(10)', false, '2') or error('Unable to add column "accent" to table "users"', __FILE__, __LINE__, $db->error());
 
 		// Since 1.1.4289: Add the adapt_time column to the users table
 		$db->add_field('users', 'adapt_time', 'TINYINT(1)', false, '0') or error('Unable to add column "adapt_time" to table "users"', __FILE__, __LINE__, $db->error());
 
 		// Since 1.1.4381: Add o_default_accent feature
 		if (!array_key_exists('o_default_accent', $luna_config))
-			$db->query('INSERT INTO '.$db->prefix.'config (conf_name, conf_value) VALUES (\'o_default_accent\', \'3\')') or error('Unable to insert config value \'o_default_accent\'', __FILE__, __LINE__, $db->error());
+			$db->query('INSERT INTO '.$db->prefix.'config (conf_name, conf_value) VALUES (\'o_default_accent\', \'2\')') or error('Unable to insert config value \'o_default_accent\'', __FILE__, __LINE__, $db->error());
 
 		// Since 1.1.4504: Add o_announcement_title feature
 		if (!array_key_exists('o_announcement_title', $luna_config))
@@ -684,6 +853,17 @@ switch ($stage) {
 		// Since 1.1.4504: Add o_announcement_type feature
 		if (!array_key_exists('o_announcement_type', $luna_config))
 			$db->query('INSERT INTO '.$db->prefix.'config (conf_name, conf_value) VALUES (\'o_announcement_type\', \'info\')') or error('Unable to insert config value \'o_announcement_type\'', __FILE__, __LINE__, $db->error());
+
+		// Since 1.1.4682: Add the solved column to the topics table
+		$db->add_field('topics', 'solved', 'INT(10) UNSIGNED', true) or error('Unable to add solved field', __FILE__, __LINE__, $db->error());
+
+		// Since 1.1.4688: Add o_board_tags feature
+		if (!array_key_exists('o_board_tags', $luna_config))
+			$db->query('INSERT INTO '.$db->prefix.'config (conf_name, conf_value) VALUES (\'o_board_tags\', \'\')') or error('Unable to insert config value \'o_board_tags\'', __FILE__, __LINE__, $db->error());
+
+		// Since 1.1.4704: Add o_cookie_bar_url feature
+		if (!array_key_exists('o_cookie_bar_url', $luna_config))
+			$db->query('INSERT INTO '.$db->prefix.'config (conf_name, conf_value) VALUES (\'o_cookie_bar_url\', \'http://getluna.org/docs/cookies.php\')') or error('Unable to insert config value \'o_cookie_bar_url\'', __FILE__, __LINE__, $db->error());
 
 		break;
 
@@ -836,7 +1016,7 @@ switch ($stage) {
 
 		// Check the default style still exists!
 		if (!file_exists(FORUM_ROOT.'themes/'.$luna_config['o_default_style'].'/style.css'))
-			$db->query('UPDATE '.$db->prefix.'config SET conf_value = \'Luna\' WHERE conf_name = \'o_default_style\'') or error('Unable to update default style', __FILE__, __LINE__, $db->error());
+			$db->query('UPDATE '.$db->prefix.'config SET conf_value = \'Fifteen\' WHERE conf_name = \'o_default_style\'') or error('Unable to update default style', __FILE__, __LINE__, $db->error());
 
 		// This feels like a good time to synchronize the forums
 		$result = $db->query('SELECT id FROM '.$db->prefix.'forums') or error('Unable to fetch forum IDs', __FILE__, __LINE__, $db->error());

@@ -30,12 +30,15 @@ if (isset($_SERVER['HTTP_X_MOZ']) && $_SERVER['HTTP_X_MOZ'] == 'prefetch') {
 if (file_exists(FORUM_ROOT.'config.php'))
 	require FORUM_ROOT.'config.php';
 
-// This fixes incorrect defined PUN in PunBB/FluxBB 1.2, 1.4 and 1.5 and Luna 1.6
+// This fixes incorrect defined PUN in PunBB/FluxBB 1.2, 1.4 and 1.5 and ModernBB 1.6
 if (defined('PUN'))
 	define('FORUM', PUN);
 
 // Load the functions script
 require FORUM_ROOT.'include/functions.php';
+
+// Load the security functions
+require FORUM_ROOT.'include/class/luna_nonces.php';
 
 // Load UTF-8 functions
 require FORUM_ROOT.'include/utf8/utf8.php';
@@ -200,6 +203,10 @@ if (!defined('FORUM_SEARCH_MAX_WORD'))
 
 if (!defined('FORUM_MAX_COOKIE_SIZE'))
 	define('FORUM_MAX_COOKIE_SIZE', 4048);
+
+// Are we admins?
+require_once FORUM_ROOT.'include/backstage_functions.php';
+$is_admin = check_is_admin();
 
 require FORUM_ROOT.'include/general_functions.php';
 require FORUM_ROOT.'include/draw_functions.php';

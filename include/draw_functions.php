@@ -383,7 +383,9 @@ function draw_topics_list() {
 		}
 	
 	} else {
-		'<h3 class="nothing">'.printf(__('There are no topics in this forum yet, but you can <a href="post.php?fid=%s">start the first one</a>.', 'luna'), $id).'</h3>';
+		echo '<h3 class="nothing">';
+		printf(__('There are no topics in this forum yet, but you can <a href="post.php?fid=%s">start the first one</a>.', 'luna'), $id);
+		echo '</h3>';
 	}
 	
 }
@@ -430,7 +432,7 @@ function draw_forum_list($forum_object_name = 'forum.php', $use_cat = 0, $cat_ob
 			$forum_field = '<a href="viewforum.php?id='.$cur_forum['fid'].'">'.luna_htmlspecialchars($cur_forum['forum_name']).'</a>'.(!empty($forum_field_new) ? ' '.$forum_field_new : '');
 		
 			if ($cur_forum['forum_desc'] != '')
-				$forum_desc = '<div class="forum-description">'.luna_htmlspecialchars($cur_forum['forum_desc']).'</div>';
+				$forum_desc = '<div class="forum-description">'.$cur_forum['forum_desc'].'</div>';
 		
 			$topics_label = __('topic', 'topics', $cur_forum['num_topics'], 'luna');
 			$posts_label = __('post', 'posts', $cur_forum['num_posts'], 'luna');
@@ -504,7 +506,7 @@ function draw_subforum_list($object_name = 'forum.php') {
 			$forum_field = '<a href="viewforum.php?id='.$cur_forum['fid'].'">'.luna_htmlspecialchars($cur_forum['forum_name']).'</a>'.(!empty($forum_field_new) ? ' '.$forum_field_new : '');
 		
 			if ($cur_forum['forum_desc'] != '')
-				$forum_desc = '<div class="forum-description">'.luna_htmlspecialchars($cur_forum['forum_desc']).'</div>';
+				$forum_desc = '<div class="forum-description">'.$cur_forum['forum_desc'].'</div>';
 		
 			$topics_label = __('topic', 'topics', $cur_forum['num_topics'], 'luna');
 			$posts_label = __('post', 'posts', $cur_forum['num_posts'], 'luna');
@@ -515,24 +517,6 @@ function draw_subforum_list($object_name = 'forum.php') {
 			require get_view_path($object_name);
 		}
 	}
-}
-
-function draw_section_info($current_id) {
-	global $result, $db, $luna_config, $cur_section, $luna_user, $cur_posting, $cur_forum;
-
-	if ($current_id != 0) {
-		$result = $db->query('SELECT * FROM '.$db->prefix.'forums where id = '.$current_id) or error('Unable to fetch forum info', __FILE__, __LINE__, $db->error());
-		
-		if (!$db->num_rows($result))
-			message(__('Bad request. The link you followed is incorrect, outdated or you are simply not allowed to hang around here.', 'luna'), false, '404 Not Found');
-		
-		$cur_section = $db->fetch_assoc($result);
-
-		$section_head = '1';
-	} else
-		$section_head = '2';
-
-	require get_view_path('section-info.php');
 }
 
 function draw_index_topics_list() {
@@ -548,6 +532,7 @@ function draw_index_topics_list() {
 			$topic_ids[] = $cur_topic_id;
 
 		// Fetch list of topics to display on this page
+		$sql_soft = NULL;
 		if ($luna_user['is_guest'] || $luna_config['o_has_posted'] == '0') {
 			if (!$luna_user['g_soft_delete_view'])
 				$sql_soft = 'soft = 0 AND ';
@@ -660,8 +645,8 @@ function draw_index_topics_list() {
 		echo '<h3 class="nothing">'.__('The board is empty, select a forum and create a topic to begin.', 'luna').'</h3>';
 }
 
-function draw_topic_list() {
-	global $result, $db, $luna_config, $id, $post_ids, $is_admmod, $start_from, $post_count, $admin_ids, $luna_user, $cur_topic;
+function draw_comment_list() {
+	global $db, $luna_config, $id, $post_ids, $is_admmod, $start_from, $post_count, $admin_ids, $luna_user, $cur_topic, $started_by;
 
 	// Retrieve the posts (and their respective poster/online status)
 	$result = $db->query('SELECT u.email, u.title, u.url, u.location, u.signature, u.email_setting, u.num_posts, u.registered, u.admin_note, p.id, p.poster AS username, p.poster_id, p.poster_ip, p.poster_email, p.message, p.hide_smilies, p.posted, p.edited, p.edited_by, p.marked, p.soft, g.g_id, g.g_user_title, o.user_id AS is_online FROM '.$db->prefix.'posts AS p INNER JOIN '.$db->prefix.'users AS u ON u.id=p.poster_id INNER JOIN '.$db->prefix.'groups AS g ON g.g_id=u.group_id LEFT JOIN '.$db->prefix.'online AS o ON (o.user_id=u.id AND o.user_id!=1 AND o.idle=0) WHERE p.id IN ('.implode(',', $post_ids).') ORDER BY p.id', true) or error('Unable to fetch post info', __FILE__, __LINE__, $db->error());
@@ -774,11 +759,11 @@ function draw_topic_list() {
 					$post_actions[] = '<a href="post.php?tid='.$id.'&amp;qid='.$cur_post['id'].'">'.__('Quote', 'luna').'</a>';
 			}
 		} else {
-			if ($cur_post['marked'] == false) {
+			if ($cur_post['marked'] == false)
 				$post_actions[] = '<a href="misc.php?report='.$cur_post['id'].'">'.__('Report', 'luna').'</a>';
-			} else {
-				$post_actions[] = '<a class="reported" disabled="disabled" href="misc.php?report='.$cur_post['id'].'">'.__('Report', 'luna').'</a>';
-			}
+			else
+				$post_actions[] = '<a disabled="disabled" href="misc.php?report='.$cur_post['id'].'">'.__('Report', 'luna').'</a>';
+
 			if ($luna_user['g_id'] == FORUM_ADMIN || !in_array($cur_post['poster_id'], $admin_ids)) {
 				$post_actions[] = '<a href="delete.php?id='.$cur_post['id'].'&action=delete">'.__('Delete', 'luna').'</a>';
 				if ($cur_post['soft'] == 0)
@@ -1148,17 +1133,28 @@ function draw_report_form($post_id) {
 	global $post_id;
 ?>
 
-<form id="report" method="post" action="misc.php?report=<?php echo $post_id ?>" onsubmit="this.submit.disabled=true;if(process_form(this)){return true;}else{this.submit.disabled=false;return false;}">
+<form class="form-horizontal" id="report" method="post" action="misc.php?report=<?php echo $post_id ?>" onsubmit="this.submit.disabled=true;if(process_form(this)){return true;}else{this.submit.disabled=false;return false;}">
 	<div class="panel panel-default">
 		<div class="panel-heading">
-			<h3 class="panel-title"><?php _e('Tell us why you are reporting this.', 'luna') ?></h3>
+			<h3 class="panel-title"><?php _e('Report', 'luna') ?></h3>
 		</div>
-		<fieldset>
-			<input type="hidden" name="form_sent" value="1" />
-			<textarea class="form-control textarea" name="req_reason" rows="5"></textarea>
-		</fieldset>
-		<div class="panel-footer">
-			<input type="submit" class="btn btn-primary" name="submit" value="<?php _e('Submit', 'luna') ?>" accesskey="s" />
+		<div class="panel-body">
+			<fieldset>
+				<input type="hidden" name="form_sent" value="1" />
+				<div class="form-group">
+					<label class="col-sm-3 control-label"><?php _e('Tell us why you are reporting this', 'luna') ?></label>
+					<div class="col-sm-9">
+						<textarea class="form-control" name="req_reason" rows="5"></textarea>
+					</div>
+				</div>
+				<div class="form-group">
+					<div class="col-sm-3"></div>
+					<div class="col-sm-9">
+						<a href="viewtopic.php?pid=<?php echo $post_id ?>#p<?php echo $post_id ?>" class="btn btn-default"><span class="fa fa-fw fa-chevron-left"></span> <?php _e('Cancel', 'luna') ?></a>
+						<button type="submit" class="btn btn-primary" name="submit" accesskey="s"><span class="fa fa-fw fa-check"></span> <?php _e('Submit', 'luna') ?></button>
+					</div>
+				</div>
+			</fieldset>
 		</div>
 	</div>
 </form>
@@ -1237,4 +1233,31 @@ function draw_mark_read($class, $page) {
 
 	if (!$luna_user['is_guest'])
 		echo '<a'.$classes.' href="'.$url.'">'.__('Mark as read', 'luna').'</a>';
+}
+
+function draw_wall_error($description, $action = NULL, $title = NULL) {
+?>
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<title><?php _e('Luna', 'luna') ?></title>
+		<link rel="stylesheet" type="text/css" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" />
+		<link rel="stylesheet" type="text/css" href="<?php echo FORUM_ROOT ?>include/css/system.css" />
+	</head>
+	<body class="wall">
+		<h1><?php if ($title != NULL) { echo $title; } else { echo 'Luna'; } ?></h1>
+		<p><?php echo $description; ?></p>
+		<p><?php echo $action; ?></p>
+	</body>
+</html>
+<?php
+}
+
+function draw_user_nav_menu() {
+	global $luna_user;
+
+	$items = get_user_nav_menu_items();
+
+	require get_view_path('user-navmenu.php');
 }

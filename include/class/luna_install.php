@@ -10,7 +10,7 @@
 class Installer {
 	
 	const DEFAULT_LANG = 'English';
-	const DEFAULT_STYLE = 'Luna';
+	const DEFAULT_STYLE = 'Fifteen';
 	
 	public static function is_supported_php_version() {
 		return function_exists('version_compare') && version_compare(PHP_VERSION, Version::MIN_PHP_VERSION, '>=');
@@ -48,6 +48,9 @@ class Installer {
 
 		if (function_exists('sqlite_open'))
 			$db_extensions[] = array('sqlite', 'SQLite');
+
+		if (class_exists('SQLite3'))
+			$db_extensions[] = array('sqlite3', 'SQLite3');
 
 		if (function_exists('pg_connect'))
 			$db_extensions[] = array('pgsql', 'PostgreSQL');
@@ -135,6 +138,10 @@ class Installer {
 			case 'sqlite':
 				require FORUM_ROOT.'include/dblayer/sqlite.php';
 				break;
+
+			case 'sqlite3':
+				require FORUM_ROOT.'include/dblayer/sqlite3.php';
+				break;
 	
 			default:
 				error(sprintf(__('"%s" is not a valid database type', 'luna'), luna_htmlspecialchars($db_type)));
@@ -161,6 +168,7 @@ class Installer {
 				break;
 	
 			case 'sqlite':
+			case 'sqlite3':
 				if (strtolower($db_prefix) == 'sqlite_')
 					error(__('The table prefix \'sqlite_\' is reserved for use by the SQLite engine. Please choose a different prefix', 'luna'));
 				break;
@@ -401,7 +409,7 @@ class Installer {
 				'color'			=> array(
 					'datatype'		=> 'VARCHAR(25)',
 					'allow_null'	=> false,
-					'default'		=> '\'#0d4382\''
+					'default'		=> '\'#2788cb\''
 				),
 				'parent_id'		=> array(
 					'datatype'		=> 'INT',
@@ -917,7 +925,7 @@ class Installer {
 			)
 		);
 	
-		if ($db_type == 'sqlite') {
+		if ($db_type == 'sqlite' || $db_type == 'sqlite3') {
 			$schema['PRIMARY KEY'] = array('id');
 			$schema['UNIQUE KEYS'] = array('word_idx'	=> array('word'));
 		}
@@ -1041,6 +1049,11 @@ class Installer {
 					'datatype'		=> 'TINYINT(1)',
 					'allow_null'	=> false,
 					'default'		=> '0'
+				),
+				'solved'		=> array(
+					'datatype'		=> 'INT(10) UNSIGNED',
+					'allow_null'	=> true,
+					'default'		=> NULL
 				)
 			),
 			'PRIMARY KEY'	=> array('id'),
@@ -1276,7 +1289,7 @@ class Installer {
 				'color_scheme'	=> array(
 					'datatype'		=> 'INT(25)',
 					'allow_null'	=> false,
-					'default'		=> '3'
+					'default'		=> '2'
 				),
 				'adapt_time'		=> array(
 					'datatype'		=> 'TINYINT(1)',
@@ -1286,7 +1299,7 @@ class Installer {
 				'accent'	=> array(
 					'datatype'		=> 'INT(25)',
 					'allow_null'	=> false,
-					'default'		=> '3'
+					'default'		=> '2'
 				)
 			),
 			'PRIMARY KEY'	=> array('id'),
@@ -1404,6 +1417,7 @@ class Installer {
 			'o_parser_revision'			=> Version::FORUM_PARSER_VERSION,
 			'o_board_title'				=> $title,
 			'o_board_desc'				=> $description,
+			'o_board_tags'				=> NULL,
 			'o_default_timezone'		=> 0,
 			'o_time_format'				=> __('H:i', 'luna'),
 			'o_date_format'				=> __('j M Y', 'luna'),
@@ -1416,7 +1430,7 @@ class Installer {
 			'o_make_links'				=> 1,
 			'o_default_lang'			=> $default_lang,
 			'o_default_style'			=> $default_style,
-			'o_default_accent'			=> 3,
+			'o_default_accent'			=> 2,
 			'o_default_user_group'		=> 4,
 			'o_topic_review'			=> 15,
 			'o_disp_topics_default'		=> 30,
@@ -1469,6 +1483,7 @@ class Installer {
 			'o_feed_type'				=> 2,
 			'o_feed_ttl'				=> 0,
 			'o_cookie_bar'				=> 0,
+			'o_cookie_bar_url'			=> 'http://getluna.org/docs/cookies.php',
 			'o_moderated_by'			=> 1,
 			'o_admin_note'				=> '',
 			'o_pms_enabled'				=> 1,
@@ -1574,7 +1589,7 @@ class Installer {
 			or error('Unable to insert into table '.$db->prefix.'ranks. Please check your configuration and try again', __FILE__, __LINE__, $db->error());
 
 		require FORUM_ROOT.'include/notifications.php';		
-		new_notification('2', 'backstage/about.php', 'Welcome to Luna, discover the possibilities!', 'luni-logo', 'luni');
+		new_notification('2', 'backstage/about.php', 'Welcome to Luna, discover the possibilities!', 'fa-moon-o');
 		
 		$db->end_transaction();
 	}

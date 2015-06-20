@@ -14,7 +14,7 @@ require FORUM_ROOT.'include/class/luna_notification.php';
  * 
  * @return   int    Notification ID on success, 0 on fail
  */
-function new_notification($user, $message, $link = '', $icon = '') {
+function new_notification($user, $link = '', $message, $icon = '') {
 
 	return LunaNotification::add($user, $message, $link, $icon);
 }
@@ -31,6 +31,20 @@ function new_notification($user, $message, $link = '', $icon = '') {
 function delete_notification($id) {
 
 	return LunaNotification::delete($id);
+}
+
+/**
+ * Mark a specific notification as viewed.
+ * 
+ * @since    1.1
+ * 
+ * @param    int    Notification ID
+ * 
+ * @return   boolean
+ */
+function read_notification($id) {
+
+	return LunaNotification::read($id);
 }
 
 /**
