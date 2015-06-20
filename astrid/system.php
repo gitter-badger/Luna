@@ -1,7 +1,15 @@
 <?php
+
+/*
+ * Copyright (c) 2013-2015 Luna
+ * Licensed under MIT
+ */
+
+define( 'JEWEL_ROOT', '../' );
 include('include/header.php');
 
 Astrid::DrawAstridNav( 'system', 'backstage' );
+
 ?>
 <div class="panel panel-default">
 	<div class="panel-heading">

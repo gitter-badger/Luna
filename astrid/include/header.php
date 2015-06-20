@@ -1,5 +1,12 @@
 <?php
+
+/*
+ * Copyright (c) 2013-2015 Luna
+ * Licensed under MIT
+ */
+ 
 include_once('include/common.php');
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
