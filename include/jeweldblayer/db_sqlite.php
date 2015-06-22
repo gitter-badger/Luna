@@ -5,7 +5,7 @@
  * License under MIT
  */
 
-// Do we have support for SQLite?
+// Do we have support for SQLite 2?
 if (!function_exists('sqlite_open'))
 	exit('Your host does not support SQLite 2. SQLite 2 support is required to use a SQLite 2 database to run Luna.');
 
@@ -25,7 +25,7 @@ class DBConnect {
 	var $stored_queries = array();
 	var $transaction_running = 0;
 
-	function DBConnect($db_host, $db_username, $db_password, $db_name, $db_prefix, $p_connect) {
+	function __construct($db_host, $db_username, $db_password, $db_name, $db_prefix, $p_connect) {
 		// Prepend $db_name with the path to the forum root directory
 		$db_name = FORUM_ROOT.$db_name;
 
@@ -53,6 +53,10 @@ class DBConnect {
 			error('Unable to open database \''.$db_name.'\'. SQLite reported: '.$sqlite_error, __FILE__, __LINE__);
 		else
 			return $this->link_id;
+	}
+	
+	function DBLayer($db_host, $db_username, $db_password, $db_name, $db_prefix, $p_connect) {  
+		$this->__construct($db_host, $db_username, $db_password, $db_name, $db_prefix, $p_connect);
 	}
 
 	function start_connection() {
