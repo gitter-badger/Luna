@@ -32,8 +32,8 @@ Astrid::DrawAstridNav( 'system', 'backstage' );
 				<td>3.3.4</td>
 			</tr>
 			<tr>
-				<td>Core version</td>
-				<td><?php echo Version::LUNA_CORE_VERSION ?></td>
+				<td>Jewel version</td>
+				<td><?php echo Version::LUNA_JEWEL_VERSION ?></td>
 				<td>Font Awesome version</td>
 				<td>4.3.0</td>
 			</tr>
