@@ -8,6 +8,7 @@
  */
 
 define('FORUM_ROOT', dirname(__FILE__).'/');
+define('JEWEL_ROOT', dirname(__FILE__).'/');
 require FORUM_ROOT.'include/common.php';
 
 if ($luna_user['g_read_board'] == '0')

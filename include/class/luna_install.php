@@ -204,7 +204,7 @@ class Installer {
 		error(sprintf(__('A table called "%susers" is already present in the database "%s". This could mean that Luna is already installed or that another piece of software is installed and is occupying one or more of the table names Luna requires. If you want to install multiple copies of Luna in the same database, you must choose a different table prefix', 'luna'), $db->prefix, $db_name));
 		
 		// Start a transaction
-		$db->start_transaction();
+		$db->start_connection();
 		
 		// Create all tables
 		$schema = array(
@@ -248,7 +248,7 @@ class Installer {
 		if ($db_type == 'mysql' || $db_type == 'mysqli' || $db_type == 'mysql_innodb' || $db_type == 'mysqli_innodb')
 			$schema['INDEXES']['username_idx'] = array('username(25)');
 	
-		$db->create_table('bans', $schema) or error('Unable to create bans table', __FILE__, __LINE__, $db->error());
+		$db->add_table('bans', $schema) or error('Unable to create bans table', __FILE__, __LINE__, $db->error());
 	
 	
 		$schema = array(
@@ -271,7 +271,7 @@ class Installer {
 			'PRIMARY KEY'	=> array('id')
 		);
 	
-		$db->create_table('categories', $schema) or error('Unable to create categories table', __FILE__, __LINE__, $db->error());
+		$db->add_table('categories', $schema) or error('Unable to create categories table', __FILE__, __LINE__, $db->error());
 	
 	
 		$schema = array(
@@ -294,7 +294,7 @@ class Installer {
 			'PRIMARY KEY'	=> array('id')
 		);
 	
-		$db->create_table('censoring', $schema) or error('Unable to create censoring table', __FILE__, __LINE__, $db->error());
+		$db->add_table('censoring', $schema) or error('Unable to create censoring table', __FILE__, __LINE__, $db->error());
 	
 	
 		$schema = array(
@@ -312,7 +312,7 @@ class Installer {
 			'PRIMARY KEY'	=> array('conf_name')
 		);
 	
-		$db->create_table('config', $schema) or error('Unable to create config table', __FILE__, __LINE__, $db->error());
+		$db->add_table('config', $schema) or error('Unable to create config table', __FILE__, __LINE__, $db->error());
 	
 	
 		$schema = array(
@@ -346,7 +346,7 @@ class Installer {
 			'PRIMARY KEY'	=> array('group_id', 'forum_id')
 		);
 	
-		$db->create_table('forum_perms', $schema) or error('Unable to create forum_perms table', __FILE__, __LINE__, $db->error());
+		$db->add_table('forum_perms', $schema) or error('Unable to create forum_perms table', __FILE__, __LINE__, $db->error());
 	
 	
 		$schema = array(
@@ -420,7 +420,7 @@ class Installer {
 			'PRIMARY KEY'	=> array('id')
 		);
 	
-		$db->create_table('forums', $schema) or error('Unable to create forums table', __FILE__, __LINE__, $db->error());
+		$db->add_table('forums', $schema) or error('Unable to create forums table', __FILE__, __LINE__, $db->error());
 	
 	
 		$schema = array(
@@ -567,7 +567,7 @@ class Installer {
 			'PRIMARY KEY'	=> array('g_id')
 		);
 		
-		$db->create_table('groups', $schema) or error('Unable to create groups table', __FILE__, __LINE__, $db->error());
+		$db->add_table('groups', $schema) or error('Unable to create groups table', __FILE__, __LINE__, $db->error());
 	
 		$schema = array(
 			'FIELDS'		=> array(
@@ -604,7 +604,7 @@ class Installer {
 			'PRIMARY KEY'	=> array('id')
 		);
 	
-		$db->create_table('menu', $schema) or error('Unable to create menu table', __FILE__, __LINE__, $db->error());
+		$db->add_table('menu', $schema) or error('Unable to create menu table', __FILE__, __LINE__, $db->error());
 	
 	
 		$schema = array(
@@ -647,7 +647,7 @@ class Installer {
 			'PRIMARY KEY'		=> array('id'),
 		);
 		
-		$db->create_table('notifications', $schema) or error('Unable to create notifications table', __FILE__, __LINE__, $db->error());
+		$db->add_table('notifications', $schema) or error('Unable to create notifications table', __FILE__, __LINE__, $db->error());
 	
 	
 		$schema = array(
@@ -699,7 +699,7 @@ class Installer {
 		if ($db_type == 'mysql_innodb' || $db_type == 'mysqli_innodb')
 			$schema['ENGINE'] = 'InnoDB';
 	
-		$db->create_table('online', $schema) or error('Unable to create online table', __FILE__, __LINE__, $db->error());
+		$db->add_table('online', $schema) or error('Unable to create online table', __FILE__, __LINE__, $db->error());
 	
 	
 		$schema = array(
@@ -771,7 +771,7 @@ class Installer {
 			)
 		);
 	
-		$db->create_table('posts', $schema) or error('Unable to create posts table', __FILE__, __LINE__, $db->error());
+		$db->add_table('posts', $schema) or error('Unable to create posts table', __FILE__, __LINE__, $db->error());
 	
 	
 		$schema = array(
@@ -794,7 +794,7 @@ class Installer {
 			'PRIMARY KEY'	=> array('id')
 		);
 	
-		$db->create_table('ranks', $schema) or error('Unable to create ranks table', __FILE__, __LINE__, $db->error());
+		$db->add_table('ranks', $schema) or error('Unable to create ranks table', __FILE__, __LINE__, $db->error());
 	
 	
 		$schema = array(
@@ -847,7 +847,7 @@ class Installer {
 			)
 		);
 	
-		$db->create_table('reports', $schema) or error('Unable to create reports table', __FILE__, __LINE__, $db->error());
+		$db->add_table('reports', $schema) or error('Unable to create reports table', __FILE__, __LINE__, $db->error());
 	
 	
 		$schema = array(
@@ -876,7 +876,7 @@ class Installer {
 		if ($db_type == 'mysql' || $db_type == 'mysqli' || $db_type == 'mysql_innodb' || $db_type == 'mysqli_innodb')
 			$schema['INDEXES']['ident_idx'] = array('ident(8)');
 	
-		$db->create_table('search_cache', $schema) or error('Unable to create search_cache table', __FILE__, __LINE__, $db->error());
+		$db->add_table('search_cache', $schema) or error('Unable to create search_cache table', __FILE__, __LINE__, $db->error());
 	
 	
 		$schema = array(
@@ -903,7 +903,7 @@ class Installer {
 			)
 		);
 	
-		$db->create_table('search_matches', $schema) or error('Unable to create search_matches table', __FILE__, __LINE__, $db->error());
+		$db->add_table('search_matches', $schema) or error('Unable to create search_matches table', __FILE__, __LINE__, $db->error());
 	
 	
 		$schema = array(
@@ -930,7 +930,7 @@ class Installer {
 			$schema['UNIQUE KEYS'] = array('word_idx'	=> array('word'));
 		}
 	
-		$db->create_table('search_words', $schema) or error('Unable to create search_words table', __FILE__, __LINE__, $db->error());
+		$db->add_table('search_words', $schema) or error('Unable to create search_words table', __FILE__, __LINE__, $db->error());
 	
 	
 		$schema = array(
@@ -949,7 +949,7 @@ class Installer {
 			'PRIMARY KEY'	=> array('user_id', 'topic_id')
 		);
 	
-		$db->create_table('topic_subscriptions', $schema) or error('Unable to create topic subscriptions table', __FILE__, __LINE__, $db->error());
+		$db->add_table('topic_subscriptions', $schema) or error('Unable to create topic subscriptions table', __FILE__, __LINE__, $db->error());
 	
 	
 		$schema = array(
@@ -968,7 +968,7 @@ class Installer {
 			'PRIMARY KEY'	=> array('user_id', 'forum_id')
 		);
 	
-		$db->create_table('forum_subscriptions', $schema) or error('Unable to create forum subscriptions table', __FILE__, __LINE__, $db->error());
+		$db->add_table('forum_subscriptions', $schema) or error('Unable to create forum subscriptions table', __FILE__, __LINE__, $db->error());
 	
 	
 		$schema = array(
@@ -1066,7 +1066,7 @@ class Installer {
 			)
 		);
 	
-		$db->create_table('topics', $schema) or error('Unable to create topics table', __FILE__, __LINE__, $db->error());
+		$db->add_table('topics', $schema) or error('Unable to create topics table', __FILE__, __LINE__, $db->error());
 	
 		$schema = array(
 			'FIELDS'		=> array(
@@ -1314,7 +1314,7 @@ class Installer {
 		if ($db_type == 'mysql' || $db_type == 'mysqli' || $db_type == 'mysql_innodb' || $db_type == 'mysqli_innodb')
 			$schema['UNIQUE KEYS']['username_idx'] = array('username(25)');
 	
-		$db->create_table('users', $schema) or error('Unable to create users table', __FILE__, __LINE__, $db->error());
+		$db->add_table('users', $schema) or error('Unable to create users table', __FILE__, __LINE__, $db->error());
 		
 		$schema = array(
 			'FIELDS'			=> array(
@@ -1405,7 +1405,7 @@ class Installer {
 			'PRIMARY KEY'		=> array('id'),
 		);
 		
-		$db->create_table('messages', $schema) or error('Unable to create messages table', __FILE__, __LINE__, $db->error());
+		$db->add_table('messages', $schema) or error('Unable to create messages table', __FILE__, __LINE__, $db->error());
 
 		// Insert config data
 		$luna_config = array(
@@ -1519,7 +1519,7 @@ class Installer {
 				or error('Unable to insert into table '.$db_prefix.'config. Please check your configuration and try again', __FILE__, __LINE__, $db->error());
 		}
 		
-		$db->end_transaction();
+		$db->end_connection();
 
 		return $db;
 	}
@@ -1529,7 +1529,7 @@ class Installer {
 		
 		$now = time();
 		
-		$db->start_transaction();
+		$db->start_connection();
 
 		// Insert guest and first admin user
 		$db->query('INSERT INTO '.$db->prefix.'users (group_id, username, password, email) VALUES(3, \''.$db->escape(__('Guest', 'luna')).'\', \''.$db->escape(__('Guest', 'luna')).'\', \''.$db->escape(__('Guest', 'luna')).'\')')
@@ -1538,7 +1538,7 @@ class Installer {
 		$db->query('INSERT INTO '.$db->prefix.'users (group_id, username, password, email, language, style, num_posts, last_post, registered, registration_ip, last_visit) VALUES(1, \''.$db->escape($username).'\', \''.luna_hash($password).'\', \''.$email.'\', \''.$db->escape($language).'\', \''.$db->escape($style).'\', 1, '.$now.', '.$now.', \''.$db->escape(get_remote_address()).'\', '.$now.')')
 			or error('Unable to add administrator user. Please check your configuration and try again', __FILE__, __LINE__, $db->error());
 		
-		$db->end_transaction();
+		$db->end_connection();
 	}
 	
 	public static function insert_default_groups() {
@@ -1546,7 +1546,7 @@ class Installer {
 		
 		$now = time();
 		
-		$db->start_transaction();
+		$db->start_connection();
 
 		// Insert the first 4 groups
 		$db->query('INSERT INTO '.$db->prefix.'groups ('.($db_type != 'pgsql' ? 'g_id, ' : '').'g_title, g_user_title, g_moderator, g_mod_edit_users, g_mod_rename_users, g_mod_change_passwords, g_mod_ban_users, g_read_board, g_view_users, g_post_replies, g_post_topics, g_edit_posts, g_delete_posts, g_delete_topics, g_set_title, g_search, g_search_users, g_send_email, g_post_flood, g_search_flood, g_email_flood, g_report_flood, g_soft_delete_view, g_soft_delete_posts, g_soft_delete_topics) VALUES('.($db_type != 'pgsql' ? '1, ' : '').'\''.$db->escape(__('Administrators', 'luna')).'\', \''.$db->escape(__('Administrator', 'luna')).'\', 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1)') or error('Unable to add group', __FILE__, __LINE__, $db->error());
@@ -1557,13 +1557,13 @@ class Installer {
 	
 		$db->query('INSERT INTO '.$db->prefix.'groups ('.($db_type != 'pgsql' ? 'g_id, ' : '').'g_title, g_user_title, g_moderator, g_mod_edit_users, g_mod_rename_users, g_mod_change_passwords, g_mod_ban_users, g_read_board, g_view_users, g_post_replies, g_post_topics, g_edit_posts, g_delete_posts, g_delete_topics, g_set_title, g_search, g_search_users, g_send_email, g_post_flood, g_search_flood, g_email_flood, g_report_flood, g_soft_delete_view, g_soft_delete_posts, g_soft_delete_topics) VALUES('.($db_type != 'pgsql' ? '4, ' : '').'\''.$db->escape(__('Members', 'luna')).'\', NULL, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 60, 30, 60, 60, 0, 0, 0)') or error('Unable to add group', __FILE__, __LINE__, $db->error());
 		
-		$db->end_transaction();
+		$db->end_connection();
 	}
 	
 	public static function instert_default_menu() {
 		global $db;
 		
-		$db->start_transaction();
+		$db->start_connection();
 
 		$db->query('INSERT INTO '.$db->prefix.'menu (url, name, disp_position, visible, sys_entry) VALUES(\'index.php\', \'Index\', 1, \'1\', 1)')
 			or error('Unable to add Index menu item. Please check your configuration and try again', __FILE__, __LINE__, $db->error());
@@ -1574,7 +1574,7 @@ class Installer {
 		$db->query('INSERT INTO '.$db->prefix.'menu (url, name, disp_position, visible, sys_entry) VALUES(\'search.php\', \'Search\', 3, \'1\', 1)')
 			or error('Unable to add Search menu item. Please check your configuration and try again', __FILE__, __LINE__, $db->error());
 		
-		$db->end_transaction();
+		$db->end_connection();
 	}
 	
 	public static function insert_default_data() {
@@ -1582,7 +1582,7 @@ class Installer {
 		
 		$now = time();
 		
-		$db->start_transaction();
+		$db->start_connection();
 
 		$db->query('INSERT INTO '.$db->prefix.'ranks (rank, min_posts) VALUES(\''.$db->escape(__('New member', 'luna')).'\', 0)')
 			or error('Unable to insert into table '.$db->prefix.'ranks. Please check your configuration and try again', __FILE__, __LINE__, $db->error());
@@ -1593,6 +1593,6 @@ class Installer {
 		require FORUM_ROOT.'include/notifications.php';		
 		new_notification('2', 'backstage/about.php', 'Welcome to Luna, discover the possibilities!', 'fa-moon-o');
 		
-		$db->end_transaction();
+		$db->end_connection();
 	}
 }

@@ -31,7 +31,7 @@ if (defined('FORUM_DEBUG')) {
 
 
 // End the transaction
-$db->end_transaction();
+$db->end_connection();
 
 ?>
 			</div>

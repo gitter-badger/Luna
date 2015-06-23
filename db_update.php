@@ -11,6 +11,7 @@ define('FORUM_SEARCH_MIN_WORD', 3);
 define('FORUM_SEARCH_MAX_WORD', 20);
 
 define('FORUM_ROOT', dirname(__FILE__).'/');
+define('JEWEL_ROOT', dirname(__FILE__).'/');
 
 // Load the version class
 require FORUM_ROOT.'include/version.php';
@@ -102,7 +103,7 @@ define('FORUM_GUEST', 3);
 define('FORUM_MEMBER', 4);
 
 // Load DB abstraction layer and try to connect
-require FORUM_ROOT.'include/dblayer/common_db.php';
+require FORUM_ROOT.'include/jeweldblayer/get_db.php';
 
 // Check what the default character set is - since 1.2 didn't specify any we will use whatever the default was (usually latin1)
 $old_connection_charset = defined('FORUM_DEFAULT_CHARSET') ? FORUM_DEFAULT_CHARSET : $db->get_names();
@@ -223,7 +224,7 @@ if (empty($stage)) {
 <?php
 
 	}
-	$db->end_transaction();
+	$db->end_connection();
 	$db->close();
 	exit;
 
@@ -244,7 +245,7 @@ switch ($stage) {
 			
 		// Legacy support: FluxBB 1.4
 		// Make the message field MEDIUMTEXT to allow proper conversion of 65535 character posts to UTF-8
-		$db->alter_field('posts', 'message', 'MEDIUMTEXT', true) or error('Unable to alter message field', __FILE__, __LINE__, $db->error());
+		$db->change_field('posts', 'message', 'MEDIUMTEXT', true) or error('Unable to alter message field', __FILE__, __LINE__, $db->error());
 
 		// Insert new config option o_feed_ttl
 		if (!array_key_exists('o_feed_ttl', $luna_config))
@@ -263,7 +264,7 @@ switch ($stage) {
 		$db->rename_table('subscriptions', 'topic_subscriptions');
 
 		// if we don't have the forum_subscriptions table, create it
-		if (!$db->table_exists('forum_subscriptions'))
+		if (!$db->exists_table('forum_subscriptions'))
 		{
 			$schema = array(
 				'FIELDS'		=> array(
@@ -281,7 +282,7 @@ switch ($stage) {
 				'PRIMARY KEY'	=> array('user_id', 'forum_id')
 			);
 
-			$db->create_table('forum_subscriptions', $schema) or error('Unable to create forum subscriptions table', __FILE__, __LINE__, $db->error());
+			$db->add_table('forum_subscriptions', $schema) or error('Unable to create forum subscriptions table', __FILE__, __LINE__, $db->error());
 		}
 
 		// Insert new config option o_forum_subscriptions
@@ -297,11 +298,11 @@ switch ($stage) {
 			$db->query('ALTER TABLE '.$db->prefix.'online ENGINE = MyISAM') or error('Unable to change engine type of online table to MyISAM', __FILE__, __LINE__, $db->error());
 			
 		// Legacy support: FluxBB 1.5
-		$db->drop_field($db->prefix.'groups', 'g_promote_min_posts', 'INT(10) UNSIGNED', false, 0, 'g_user_title') or error('Unable to drop g_promote_min_posts field', __FILE__, __LINE__, $db->error());
-		$db->drop_field($db->prefix.'groups', 'g_promote_next_group', 'INT(10) UNSIGNED', false, 0, 'g_promote_min_posts') or error('Unable to drop g_promote_next_group field', __FILE__, __LINE__, $db->error());
-		$db->drop_field($db->prefix.'groups', 'g_post_links', 'TINYINT(1)', false, 0, 'g_delete_topics') or error('Unable to drop g_post_links field', __FILE__, __LINE__, $db->error());
-		$db->drop_field($db->prefix.'groups', 'g_mod_promote_users', 'TINYINT(1)', false, 0, 'g_mod_ban_users') or error('Unable to drop g_mod_ban_users field', __FILE__, __LINE__, $db->error());
-		if (!$db->table_exists('search_cache')) {
+		$db->delete_field($db->prefix.'groups', 'g_promote_min_posts', 'INT(10) UNSIGNED', false, 0, 'g_user_title') or error('Unable to drop g_promote_min_posts field', __FILE__, __LINE__, $db->error());
+		$db->delete_field($db->prefix.'groups', 'g_promote_next_group', 'INT(10) UNSIGNED', false, 0, 'g_promote_min_posts') or error('Unable to drop g_promote_next_group field', __FILE__, __LINE__, $db->error());
+		$db->delete_field($db->prefix.'groups', 'g_post_links', 'TINYINT(1)', false, 0, 'g_delete_topics') or error('Unable to drop g_post_links field', __FILE__, __LINE__, $db->error());
+		$db->delete_field($db->prefix.'groups', 'g_mod_promote_users', 'TINYINT(1)', false, 0, 'g_mod_ban_users') or error('Unable to drop g_mod_ban_users field', __FILE__, __LINE__, $db->error());
+		if (!$db->exists_table('search_cache')) {
 			$schema = array(
 				'FIELDS'		=> array(
 					'id'			=> array(
@@ -322,7 +323,7 @@ switch ($stage) {
 				'PRIMARY KEY'	=> array('id')
 			);
 		
-			$db->create_table('ranks', $schema) or error('Unable to create ranks table', __FILE__, __LINE__, $db->error());
+			$db->add_table('ranks', $schema) or error('Unable to create ranks table', __FILE__, __LINE__, $db->error());
 		}
 		if (!array_key_exists('o_ranks', $luna_config))
 			$db->query('INSERT INTO '.$db->prefix.'config (conf_name, conf_value) VALUES (\'o_ranks\', \'1\')') or error('Unable to insert config value \'o_ranks\'', __FILE__, __LINE__, $db->error());
@@ -367,7 +368,7 @@ switch ($stage) {
 			$db->query('INSERT INTO '.$db->prefix.'config (conf_name, conf_value) VALUES (\'o_enable_advanced_search\', \'1\')') or error('Unable to insert config value \'o_enable_advanced_search\'', __FILE__, __LINE__, $db->error());
 
 		// Since 3.3-beta: Drop the backstage_style column from the forums table
-		$db->drop_field('users', 'backstage_style', 'INT', true, 0) or error('Unable to drop backstage_style field', __FILE__, __LINE__, $db->error());
+		$db->delete_field('users', 'backstage_style', 'INT', true, 0) or error('Unable to drop backstage_style field', __FILE__, __LINE__, $db->error());
 
 		// Since 3.4-rc: Insert new config option o_cookie_bar
 		if (!array_key_exists('o_cookie_bar', $luna_config))
@@ -378,7 +379,7 @@ switch ($stage) {
 			$db->query('INSERT INTO '.$db->prefix.'config (conf_name, conf_value) VALUES (\'o_moderated_by\', \'1\')') or error('Unable to insert config value \'o_moderated_by\'', __FILE__, __LINE__, $db->error());
 
 		// Since 3.4-rc: Make password field VARCHAR(256)
-		$db->alter_field('users', 'password', 'VARCHAR(256)', true) or error('Unable to alter password field', __FILE__, __LINE__, $db->error());
+		$db->change_field('users', 'password', 'VARCHAR(256)', true) or error('Unable to alter password field', __FILE__, __LINE__, $db->error());
 
 		// Since 3.4-rc: Insert new config option video_width
 		if (!array_key_exists('o_video_width', $luna_config))
@@ -389,16 +390,16 @@ switch ($stage) {
 			$db->query('INSERT INTO '.$db->prefix.'config (conf_name, conf_value) VALUES (\'o_video_height\', \'360\')') or error('Unable to insert config value \'o_video_height\'', __FILE__, __LINE__, $db->error());
 
 		// Since 3.4.1: Drop the jabber column from the forums table
-		$db->drop_field('users', 'jabber') or error('Unable to drop jabber field', __FILE__, __LINE__, $db->error());
+		$db->delete_field('users', 'jabber') or error('Unable to drop jabber field', __FILE__, __LINE__, $db->error());
 
 		// Since 3.4.1: Drop the icq column from the forums table
-		$db->drop_field('users', 'icq') or error('Unable to drop icq field from user table', __FILE__, __LINE__, $db->error());
+		$db->delete_field('users', 'icq') or error('Unable to drop icq field from user table', __FILE__, __LINE__, $db->error());
 
 		// Since 3.4.1: Drop the yahoo column from the forums table
-		$db->drop_field('users', 'yahoo') or error('Unable to drop yahoo field from user table', __FILE__, __LINE__, $db->error());
+		$db->delete_field('users', 'yahoo') or error('Unable to drop yahoo field from user table', __FILE__, __LINE__, $db->error());
 
 		// Since 3.4.1: Drop the aim column from the forums table
-		$db->drop_field('users', 'aim') or error('Unable to drop aim field from user table', __FILE__, __LINE__, $db->error());
+		$db->delete_field('users', 'aim') or error('Unable to drop aim field from user table', __FILE__, __LINE__, $db->error());
 
 		// Since 3.4.1: Add the facebook column to the users table
 		$db->add_field('users', 'facebook', 'VARCHAR(30)', true, null) or error('Unable to add facebook field to user table', __FILE__, __LINE__, $db->error());
@@ -425,10 +426,10 @@ switch ($stage) {
 		$db->add_field('forums', 'parent_id', 'INT', true, 0) or error('Unable to add parent_id field', __FILE__, __LINE__, $db->error());
 
 		// Since 0.0.40.2944: Drop the redirect_url column to the forums table
-		$db->drop_field($db->prefix.'forums', 'redirect_url', 'VARCHAR(100)', true, 0) or error('Unable to drop redirect_url field', __FILE__, __LINE__, $db->error());
+		$db->delete_field($db->prefix.'forums', 'redirect_url', 'VARCHAR(100)', true, 0) or error('Unable to drop redirect_url field', __FILE__, __LINE__, $db->error());
 
 		// Since 0.0.40.2946: Drop the backstage_color column to the forums table
-		$db->drop_field($db->prefix.'users', 'backstage_color', 'VARCHAR(25)', false, 0) or error('Unable to drop backstage_color field', __FILE__, __LINE__, $db->error());
+		$db->delete_field($db->prefix.'users', 'backstage_color', 'VARCHAR(25)', false, 0) or error('Unable to drop backstage_color field', __FILE__, __LINE__, $db->error());
 
 		// Since 0.0.40.2975: Remove obsolete o_header_title permission from config table
 		if (array_key_exists('o_header_title', $luna_config))
@@ -451,7 +452,7 @@ switch ($stage) {
 			$db->query('DELETE FROM '.$db->prefix.'config WHERE conf_name = \'o_show_index_stats\'') or error('Unable to remove config value \'o_show_index_stats\'', __FILE__, __LINE__, $db->error());
 
 		// Since 0.0.40.2981: Add the menu table
-		if (!$db->table_exists('menu')) {
+		if (!$db->exists_table('menu')) {
 			$schema = array(
 				'FIELDS'		=> array(
 					'id'			=> array(
@@ -487,7 +488,7 @@ switch ($stage) {
 				'PRIMARY KEY'	=> array('id')
 			);
 		
-			$db->create_table('menu', $schema) or error('Unable to create menu table', __FILE__, __LINE__, $db->error());
+			$db->add_table('menu', $schema) or error('Unable to create menu table', __FILE__, __LINE__, $db->error());
 
 			$db->query('INSERT INTO '.$db_prefix.'menu (url, name, disp_position, visible, sys_entry) VALUES(\'index.php\', \'Index\', 1, \'1\', 1)')
 				or error('Unable to add Index menu item. Please check your configuration and try again', __FILE__, __LINE__, $db->error());
@@ -528,17 +529,17 @@ switch ($stage) {
 			$db->query('DELETE FROM '.$db->prefix.'config WHERE conf_name = \'o_additional_navlinks\'') or error('Unable to remove config value \'o_additional_navlinks\'', __FILE__, __LINE__, $db->error());
 
 		// Since 0.0.3221: Drop the last_poster column to the forums table
-		$db->drop_field($db->prefix.'forums', 'last_poster', 'VARCHAR(200)', true) or error('Unable to drop last_poster field', __FILE__, __LINE__, $db->error());
+		$db->delete_field($db->prefix.'forums', 'last_poster', 'VARCHAR(200)', true) or error('Unable to drop last_poster field', __FILE__, __LINE__, $db->error());
 
 		// Since 0.0.3221: Drop the last_topic column to the forums table
-		$db->drop_field($db->prefix.'forums', 'last_topic', 'VARCHAR(255)', false, 0) or error('Unable to drop last_topic field', __FILE__, __LINE__, $db->error());
+		$db->delete_field($db->prefix.'forums', 'last_topic', 'VARCHAR(255)', false, 0) or error('Unable to drop last_topic field', __FILE__, __LINE__, $db->error());
 
 		// Since 0.0.3247: Remove obsolete o_quickpost permission from config table
 		if (array_key_exists('o_quickpost', $luna_config))
 			$db->query('DELETE FROM '.$db->prefix.'config WHERE conf_name = \'o_quickpost\'') or error('Unable to remove config value \'o_quickpost\'', __FILE__, __LINE__, $db->error());
 
 		// Since 0.0.3250: Add the messages table
-		if (!$db->table_exists('messages')) {
+		if (!$db->exists_table('messages')) {
 			$schema = array(
 				'FIELDS'			=> array(
 					'id'				=> array(
@@ -628,7 +629,7 @@ switch ($stage) {
 				'PRIMARY KEY'		=> array('id'),
 			);
 			
-			$db->create_table('messages', $schema) or error('Unable to create messages table', __FILE__, __LINE__, $db->error());
+			$db->add_table('messages', $schema) or error('Unable to create messages table', __FILE__, __LINE__, $db->error());
 		}
 
 		// Since 0.0.3263: Add the g_pm column to the groups table
@@ -689,7 +690,7 @@ switch ($stage) {
 			$db->query('DELETE FROM '.$db->prefix.'config WHERE conf_name = \'o_notifications\'') or error('Unable to remove config value \'o_notifications\'', __FILE__, __LINE__, $db->error());
 
 		// Since 0.2.3423: Add the messages table
-		if (!$db->table_exists('notifications')) {
+		if (!$db->exists_table('notifications')) {
 			$schema = array(
 				'FIELDS'			=> array(
 					'id'				=> array(
@@ -730,11 +731,11 @@ switch ($stage) {
 				'PRIMARY KEY'		=> array('id'),
 			);
 			
-			$db->create_table('notifications', $schema) or error('Unable to create notifications table', __FILE__, __LINE__, $db->error());
+			$db->add_table('notifications', $schema) or error('Unable to create notifications table', __FILE__, __LINE__, $db->error());
 		}
 
 		// Since 0.2.3425: Drop the color column from the notifications table
-		$db->drop_field($db->prefix.'notifications', 'color', 'VARCHAR(255)', false, 0) or error('Unable to drop color field', __FILE__, __LINE__, $db->error());
+		$db->delete_field($db->prefix.'notifications', 'color', 'VARCHAR(255)', false, 0) or error('Unable to drop color field', __FILE__, __LINE__, $db->error());
 
 		// Since 0.2.3459: Add o_first_run_backstage feature
 		if (!array_key_exists('o_first_run_backstage', $luna_config))
@@ -777,16 +778,16 @@ switch ($stage) {
 			$db->query('INSERT INTO '.$db->prefix.'config (conf_name, conf_value) VALUES (\'o_notification_flyout\', \'1\')') or error('Unable to insert config value \'o_notification_flyout\'', __FILE__, __LINE__, $db->error());
 
 		// Since 0.3.3721: Remove reading_list table
-		if ($db->table_exists('reading_list'))
-			$db->drop_table('reading_list') or error('Unable to drop reading_list table', __FILE__, __LINE__, $db->error());
+		if ($db->exists_table('reading_list'))
+			$db->delete_table('reading_list') or error('Unable to drop reading_list table', __FILE__, __LINE__, $db->error());
 
 		// Since 0.3.3724: Remove sending_lists table
-		if ($db->table_exists('sending_lists'))
-			$db->drop_table('sending_lists') or error('Unable to drop sending_lists table', __FILE__, __LINE__, $db->error());
+		if ($db->exists_table('sending_lists'))
+			$db->delete_table('sending_lists') or error('Unable to drop sending_lists table', __FILE__, __LINE__, $db->error());
 
 		// Since 0.3.3734: Remove contacts table
-		if ($db->table_exists('contacts'))
-			$db->drop_table('contacts') or error('Unable to drop contacts table', __FILE__, __LINE__, $db->error());
+		if ($db->exists_table('contacts'))
+			$db->delete_table('contacts') or error('Unable to drop contacts table', __FILE__, __LINE__, $db->error());
 
 		// Since 0.3.3752: Add the soft column to the posts table
 		$db->add_field('posts', 'soft', 'TINYINT(1)', false, 0, null) or error('Unable to add soft field', __FILE__, __LINE__, $db->error());
@@ -815,7 +816,7 @@ switch ($stage) {
 		$db->add_field('users', 'color_scheme', 'INT(25)', false, '2') or error('Unable to add column "color_scheme" to table "users"', __FILE__, __LINE__, $db->error());
 
 		// Since 0.4.3861: Drop the color column to the users table
-		$db->drop_field($db->prefix.'users', 'color', 'VARCHAR(25)', true, 0) or error('Unable to drop color field', __FILE__, __LINE__, $db->error());
+		$db->delete_field($db->prefix.'users', 'color', 'VARCHAR(25)', true, 0) or error('Unable to drop color field', __FILE__, __LINE__, $db->error());
 
 		// Since 0.4.3902: Add o_code_name feature
 		if (!array_key_exists('o_code_name', $luna_config))
@@ -1042,7 +1043,7 @@ switch ($stage) {
 		break;
 }
 
-$db->end_transaction();
+$db->end_connection();
 $db->close();
 
 if ($query_str != '')

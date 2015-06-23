@@ -11,6 +11,7 @@ define('FORUM_SEARCH_MIN_WORD', 3);
 define('FORUM_SEARCH_MAX_WORD', 20);
 
 define('FORUM_ROOT', dirname(__FILE__).'/');
+define('JEWEL_ROOT', dirname(__FILE__).'/');
 
 // Send the Content-type header in case the web server is setup to send something else
 header('Content-type: text/html; charset=utf-8');

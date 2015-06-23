@@ -7,6 +7,7 @@
  */
 
 define('FORUM_ROOT', dirname(__FILE__).'/');
+define('JEWEL_ROOT', dirname(__FILE__).'/');
 require FORUM_ROOT.'include/common.php';
 require FORUM_ROOT.'include/inbox_functions.php';
 require FORUM_ROOT.'include/email.php';

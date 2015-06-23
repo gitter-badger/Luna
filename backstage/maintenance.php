@@ -10,6 +10,7 @@
 define('FORUM_DISABLE_BUFFERING', 1);
 
 define('FORUM_ROOT', '../');
+define('JEWEL_ROOT', '../');
 require FORUM_ROOT.'include/common.php';
 
 if (!$is_admin)
@@ -100,7 +101,7 @@ if ($action == 'rebuild') {
 			$query_str = '?action=rebuild&i_per_page='.$per_page.'&i_start_at='.$db->result($result);
 	}
 
-	$db->end_transaction();
+	$db->end_connection();
 	$db->close();
 
 	exit('<script type="text/javascript">window.location="maintenance.php'.$query_str.'"</script><hr /><p>'.sprintf(__('JavaScript redirect unsuccessful. %s to continue …', 'luna'), '<a href="maintenance.php'.$query_str.'">'.__('Click here', 'luna').'</a>').'</p>');

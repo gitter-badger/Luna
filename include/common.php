@@ -102,10 +102,10 @@ define('FORUM_GUEST', 3);
 define('FORUM_MEMBER', 4);
 
 // Load DB abstraction layer and connect
-require FORUM_ROOT.'include/dblayer/common_db.php';
+require FORUM_ROOT.'include/jeweldblayer/get_db.php';
 
 // Start a transaction
-$db->start_transaction();
+$db->start_connection();
 
 // Load cached config
 if (file_exists(FORUM_CACHE_DIR.'cache_config.php'))

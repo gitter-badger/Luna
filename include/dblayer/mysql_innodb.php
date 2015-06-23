@@ -56,7 +56,7 @@ class DBLayer {
 	}
 
 
-	function start_transaction() {
+	function start_connection() {
 		++$this->in_transaction;
 
 		mysql_query('START TRANSACTION', $this->link_id);
@@ -64,7 +64,7 @@ class DBLayer {
 	}
 
 
-	function end_transaction() {
+	function end_connection() {
 		--$this->in_transaction;
 
 		mysql_query('COMMIT', $this->link_id);
@@ -202,19 +202,19 @@ class DBLayer {
 	}
 
 
-	function table_exists($table_name, $no_prefix = false) {
+	function exists_table($table_name, $no_prefix = false) {
 		$result = $this->query('SHOW TABLES LIKE \''.($no_prefix ? '' : $this->prefix).$this->escape($table_name).'\'');
 		return $this->num_rows($result) > 0;
 	}
 
 
-	function field_exists($table_name, $field_name, $no_prefix = false) {
+	function exists_field($table_name, $field_name, $no_prefix = false) {
 		$result = $this->query('SHOW COLUMNS FROM '.($no_prefix ? '' : $this->prefix).$table_name.' LIKE \''.$this->escape($field_name).'\'');
 		return $this->num_rows($result) > 0;
 	}
 
 
-	function index_exists($table_name, $index_name, $no_prefix = false) {
+	function exists_index($table_name, $index_name, $no_prefix = false) {
 		$exists = false;
 
 		$result = $this->query('SHOW INDEX FROM '.($no_prefix ? '' : $this->prefix).$table_name);
@@ -229,8 +229,8 @@ class DBLayer {
 	}
 
 
-	function create_table($table_name, $schema, $no_prefix = false) {
-		if ($this->table_exists($table_name, $no_prefix))
+	function add_table($table_name, $schema, $no_prefix = false) {
+		if ($this->exists_table($table_name, $no_prefix))
 			return true;
 
 		$query = 'CREATE TABLE '.($no_prefix ? '' : $this->prefix).$table_name." (\n";
@@ -276,8 +276,8 @@ class DBLayer {
 	}
 
 
-	function drop_table($table_name, $no_prefix = false) {
-		if (!$this->table_exists($table_name, $no_prefix))
+	function delete_table($table_name, $no_prefix = false) {
+		if (!$this->exists_table($table_name, $no_prefix))
 			return true;
 
 		return $this->query('DROP TABLE '.($no_prefix ? '' : $this->prefix).$table_name) ? true : false;
@@ -286,7 +286,7 @@ class DBLayer {
 
 	function rename_table($old_table, $new_table, $no_prefix = false) {
 		// If the new table exists and the old one doesn't, then we're happy
-		if ($this->table_exists($new_table, $no_prefix) && !$this->table_exists($old_table, $no_prefix))
+		if ($this->exists_table($new_table, $no_prefix) && !$this->exists_table($old_table, $no_prefix))
 			return true;
 
 		return $this->query('ALTER TABLE '.($no_prefix ? '' : $this->prefix).$old_table.' RENAME TO '.($no_prefix ? '' : $this->prefix).$new_table) ? true : false;
@@ -294,7 +294,7 @@ class DBLayer {
 
 
 	function add_field($table_name, $field_name, $field_type, $allow_null, $default_value = null, $after_field = null, $no_prefix = false) {
-		if ($this->field_exists($table_name, $field_name, $no_prefix))
+		if ($this->exists_field($table_name, $field_name, $no_prefix))
 			return true;
 
 		$field_type = preg_replace(array_keys($this->datatype_transformations), array_values($this->datatype_transformations), $field_type);
@@ -306,8 +306,8 @@ class DBLayer {
 	}
 
 
-	function alter_field($table_name, $field_name, $field_type, $allow_null, $default_value = null, $after_field = null, $no_prefix = false) {
-		if (!$this->field_exists($table_name, $field_name, $no_prefix))
+	function change_field($table_name, $field_name, $field_type, $allow_null, $default_value = null, $after_field = null, $no_prefix = false) {
+		if (!$this->exists_field($table_name, $field_name, $no_prefix))
 			return true;
 
 		$field_type = preg_replace(array_keys($this->datatype_transformations), array_values($this->datatype_transformations), $field_type);
@@ -319,8 +319,8 @@ class DBLayer {
 	}
 
 
-	function drop_field($table_name, $field_name, $no_prefix = false) {
-		if (!$this->field_exists($table_name, $field_name, $no_prefix))
+	function delete_field($table_name, $field_name, $no_prefix = false) {
+		if (!$this->exists_field($table_name, $field_name, $no_prefix))
 			return true;
 
 		return $this->query('ALTER TABLE '.($no_prefix ? '' : $this->prefix).$table_name.' DROP '.$field_name) ? true : false;
@@ -328,15 +328,15 @@ class DBLayer {
 
 
 	function add_index($table_name, $index_name, $index_fields, $unique = false, $no_prefix = false) {
-		if ($this->index_exists($table_name, $index_name, $no_prefix))
+		if ($this->exists_index($table_name, $index_name, $no_prefix))
 			return true;
 
 		return $this->query('ALTER TABLE '.($no_prefix ? '' : $this->prefix).$table_name.' ADD '.($unique ? 'UNIQUE ' : '').'INDEX '.($no_prefix ? '' : $this->prefix).$table_name.'_'.$index_name.' ('.implode(',', $index_fields).')') ? true : false;
 	}
 
 
-	function drop_index($table_name, $index_name, $no_prefix = false) {
-		if (!$this->index_exists($table_name, $index_name, $no_prefix))
+	function delete_index($table_name, $index_name, $no_prefix = false) {
+		if (!$this->exists_index($table_name, $index_name, $no_prefix))
 			return true;
 
 		return $this->query('ALTER TABLE '.($no_prefix ? '' : $this->prefix).$table_name.' DROP INDEX '.($no_prefix ? '' : $this->prefix).$table_name.'_'.$index_name) ? true : false;

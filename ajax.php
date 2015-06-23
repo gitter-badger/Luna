@@ -5,7 +5,8 @@
  * License: http://opensource.org/licenses/MIT MIT
  */
 
-define('FORUM_ROOT', dirname(__FILE__) . '/');
+define('FORUM_ROOT', dirname(__FILE__).'/');
+define('JEWEL_ROOT', dirname(__FILE__).'/');
 require FORUM_ROOT.'include/common.php';
 define('DOING_AJAX', true);
 

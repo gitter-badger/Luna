@@ -14,6 +14,7 @@ if (isset($_GET['action']))
 	define('FORUM_QUIET_VISIT', 1);
 
 define('FORUM_ROOT', dirname(__FILE__).'/');
+define('JEWEL_ROOT', dirname(__FILE__).'/');
 require FORUM_ROOT.'include/common.php';
 
 $action = isset($_GET['action']) ? $_GET['action'] : null;

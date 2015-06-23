@@ -6,6 +6,7 @@
  */
 
 define('FORUM_ROOT', '../');
+define('JEWEL_ROOT', '../');
 require '../include/common.php';
 
 if (!$is_admin)

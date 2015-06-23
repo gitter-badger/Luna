@@ -8,6 +8,7 @@
  */
 
 define('FORUM_ROOT', '../');
+define('JEWEL_ROOT', '../');
 require FORUM_ROOT.'include/common.php';
 
 if ($luna_user['g_id'] != FORUM_ADMIN && ($luna_user['g_moderator'] != '1' || $luna_user['g_mod_ban_users'] == '0'))

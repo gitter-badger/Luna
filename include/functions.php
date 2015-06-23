@@ -1349,7 +1349,7 @@ function maintenance_message() {
 	draw_wall_error($luna_config['o_maintenance_message'], NULL, __('Maintenance', 'luna'));
 
 	// End the transaction
-	$db->end_transaction();
+	$db->end_connection();
 
 	// Close the db connection (and free up any result data)
 	$db->close();
@@ -1371,7 +1371,7 @@ function redirect($destination_url) {
 	// Do a little spring cleaning
 	$destination_url = preg_replace('%([\r\n])|(\%0[ad])|(;\s*data\s*:)%i', '', $destination_url);
 
-	$db->end_transaction();
+	$db->end_connection();
 	$db->close();
 
 	header('Location: '.str_replace('&amp;', '&', $destination_url));

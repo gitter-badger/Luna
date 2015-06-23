@@ -11,6 +11,7 @@
 // from the phpBB Group forum software phpBB2 (http://www.phpbb.com)
 
 define('FORUM_ROOT', dirname(__FILE__).'/');
+define('JEWEL_ROOT', dirname(__FILE__).'/');
 require FORUM_ROOT.'include/common.php';
 
 $section = isset($_GET['section']) ? $_GET['section'] : null;
@@ -376,7 +377,7 @@ if (isset($_GET['action']) || isset($_GET['search_id'])) {
 		$db->query('INSERT INTO '.$db->prefix.'search_cache (id, ident, search_data) VALUES('.$search_id.', \''.$db->escape($ident).'\', \''.$db->escape($temp).'\')') or error('Unable to insert search results', __FILE__, __LINE__, $db->error());
 
 		if ($search_type[0] != 'action') {
-			$db->end_transaction();
+			$db->end_connection();
 			$db->close();
 
 			// Redirect the user to the cached result page

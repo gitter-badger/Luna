@@ -178,7 +178,7 @@ if (defined('FORUM_DEBUG')) {
 
 
 // End the transaction
-$db->end_transaction();
+$db->end_connection();
 
 // Display executed queries (if enabled)
 if (defined('FORUM_SHOW_QUERIES'))

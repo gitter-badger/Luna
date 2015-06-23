@@ -1,6 +1,7 @@
 <?php
 
 define('FORUM_ROOT', '../');
+define('JEWEL_ROOT', '../');
 require FORUM_ROOT.'include/common.php';
 
 if ($luna_user['is_admmod'])

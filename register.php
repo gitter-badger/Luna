@@ -8,6 +8,7 @@
  */
 
 define('FORUM_ROOT', dirname(__FILE__).'/');
+define('JEWEL_ROOT', dirname(__FILE__).'/');
 require FORUM_ROOT.'include/common.php';
 
 // If we are logged in, we shouldn't be here

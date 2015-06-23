@@ -8,6 +8,7 @@
  */
 
 define('FORUM_ROOT', dirname(__FILE__).'/');
+define('JEWEL_ROOT', dirname(__FILE__).'/');
 require FORUM_ROOT.'include/common.php';
 define('FORUM_CANONICAL_TAG_FORUM', 1);
 
