@@ -8,7 +8,7 @@
 class Version {
 	// See http://getluna.org/docs/version.php for more info
 	const LUNA_VERSION = '2.0 Preview';
-	const LUNA_JEWEL_VERSION = '2.0.0.67';
+	const LUNA_JEWEL_VERSION = '2.0.0.74';
 
 	// The Luna Core code name
 	const LUNA_CODE_NAME = 'denim';
