@@ -60,7 +60,7 @@ class Astrid {
 		<div class="row">
 			<h2 class="hidden-xs">
 				<i class="fa fa-fw fa-dashboard"></i> <?php echo $page_title ?>
-				<span class="pull-right" style="font-size: 70%;"> <?php echo Version::LUNA_CORE_VERSION ?></span>
+				<span class="pull-right" style="font-size: 70%;"> <?php echo Version::LUNA_JEWEL_VERSION ?></span>
 			</h2>
 			<ul class="nav nav-tabs" role="tablist">
 				<li class="<?php if ($page == 'backstage') echo 'active'; ?>"><a href="index.php"><i class="fa fa-fw fa-tachometer"></i><span class="hidden-xs"> Backstage</span></a></li>

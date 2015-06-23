@@ -58,13 +58,11 @@ class DBLayer {
 		$this->__construct($db_host, $db_username, $db_password, $db_name, $db_prefix, $p_connect);
 	}
 
-
 	function start_connection() {
 		++$this->transaction_running;
 
 		return ($this->link_id->exec('BEGIN TRANSACTION')) ? true : false;
 	}
-
 
 	function end_connection() {
 		--$this->transaction_running;
@@ -76,7 +74,6 @@ class DBLayer {
 			return false;
 		}
 	}
-
 
 	function query($sql, $unbuffered = false) {
 		if (strlen($sql) > 140000)
@@ -113,7 +110,6 @@ class DBLayer {
 		}
 	}
 
-
 	function result($query_id = 0, $row = 0, $col = 0) {
 		if ($query_id) {
 			$result_rows = array();
@@ -134,7 +130,6 @@ class DBLayer {
 		else
 			return false;
 	}
-
 
 	function fetch_assoc($query_id = 0) {
 		if ($query_id) {
@@ -157,11 +152,9 @@ class DBLayer {
 			return false;
 	}
 
-
 	function fetch_row($query_id = 0) {
 		return ($query_id) ? @$query_id->fetchArray(SQLITE3_NUM) : false;
 	}
-
 
 	function num_rows($query_id = 0) {
 		if ($query_id && preg_match ('/\bSELECT\b/i', $this->last_query)) {
@@ -174,26 +167,21 @@ class DBLayer {
 			return false;
 	}
 
-
 	function affected_rows() {
 		return ($this->query_result) ? $this->link_id->changes() : false;
 	}
-
 
 	function insert_id() {
 		return ($this->link_id) ? $this->link_id->lastInsertRowID() : false;
 	}
 
-
 	function get_num_queries() {
 		return $this->num_queries;
 	}
 
-
 	function get_stored_queries() {
 		return $this->stored_queries;
 	}
-
 
 	function free_result($query_id = false) {
 		if ($query_id) {
@@ -203,11 +191,9 @@ class DBLayer {
 		return true;
 	}
 
-
 	function escape($str) {
 		return is_array($str) ? '' : $this->link_id->escapeString($str);
 	}
-
 
 	function error() {
 		$result['error_sql'] = @current(@end($this->stored_queries));
@@ -216,7 +202,6 @@ class DBLayer {
 
 		return $result;
 	}
-
 
 	function close() {
 		if ($this->link_id) {
@@ -233,16 +218,13 @@ class DBLayer {
 			return false;
 	}
 
-
 	function get_names() {
 		return '';
 	}
 
-
 	function set_names($names) {
 		return true;
 	}
-
 
 	function get_version() {
 		$info = SQLite3::version();
@@ -252,7 +234,6 @@ class DBLayer {
 			'version'	=> $info['versionString']
 		);
 	}
-
 
 	function exists_table($table_name) {
 		$result = $this->query('SELECT COUNT(type) FROM sqlite_master WHERE name = \''.$this->prefix.$this->escape($table_name).'\' AND type=\'table\'');
@@ -266,7 +247,6 @@ class DBLayer {
 		return $exists_field;
 	}
 
-
 	function exists_field($table_name, $field_name) {
 		$result = $this->query('SELECT sql FROM sqlite_master WHERE name = \''.$this->prefix.$this->escape($table_name).'\' AND type=\'table\'');
 		$sql = $this->result($result);
@@ -276,7 +256,6 @@ class DBLayer {
 
 		return (preg_match('%[\r\n]'.preg_quote($field_name).' %', $sql) === 1);
 	}
-
 
 	function exists_index($table_name, $index_name) {
 		$result = $this->query('SELECT COUNT(type) FROM sqlite_master WHERE tbl_name = \''.$this->prefix.$this->escape($table_name).'\' AND name = \''.$this->prefix.$this->escape($table_name).'_'.$this->escape($index_name).'\' AND type=\'index\'');
@@ -289,7 +268,6 @@ class DBLayer {
 
 		return $exists_index;
 	}
-
 
 	function add_table($table_name, $schema) {
 		if ($this->exists_field($table_name))
@@ -336,14 +314,12 @@ class DBLayer {
 		return $result;
 	}
 
-
 	function delete_table($table_name) {
 		if (!$this->exists_field($table_name))
 			return true;
 
 		return $this->query('DROP TABLE '.$this->prefix.$this->escape($table_name)) ? true : false;
 	}
-
 
 	function rename_table($old_table, $new_table) {
 		// If the old table does not exist
@@ -380,7 +356,6 @@ class DBLayer {
 
 		return $result;
 	}
-
 
 	function get_table_info($table_name) {
 		// Grab table info
@@ -424,7 +399,6 @@ class DBLayer {
 
 		return $table;
 	}
-
 
 	function add_field($table_name, $field_name, $field_type, $allow_null, $default_value = null, $after_field = null) {
 		if ($this->exists_field($table_name, $field_name))
@@ -502,12 +476,10 @@ class DBLayer {
 		return $result;
 	}
 
-
 	function change_field($table_name, $field_name, $field_type, $allow_null, $default_value = null, $after_field = null) {
 		// Unneeded for SQLite
 		return true;
 	}
-
 
 	function delete_field($table_name, $field_name) {
 		if (!$this->exists_field($table_name, $field_name))
@@ -560,7 +532,6 @@ class DBLayer {
 		return $result;
 	}
 
-
 	function add_index($table_name, $index_name, $index_fields, $unique = false) {
 		if ($this->exists_index($table_name, $index_name))
 			return true;
@@ -568,12 +539,21 @@ class DBLayer {
 		return $this->query('CREATE '.($unique ? 'UNIQUE ' : '').'INDEX '.$this->prefix.$table_name.'_'.$index_name.' ON '.$this->prefix.$table_name.'('.implode(',', $index_fields).')') ? true : false;
 	}
 
-
 	function delete_index($table_name, $index_name) {
 		if (!$this->exists_index($table_name, $index_name))
 			return true;
 
 		return $this->query('DROP INDEX '.$this->prefix.$table_name.'_'.$index_name) ? true : false;
+	}
+
+	function add_config($config_name, $config_value) {
+		if (!array_key_exists($config_name, $luna_config))
+			return $this->query('INSERT INTO '.$this->prefix.'config (conf_name, conf_value) VALUES (\''.$config_name.'\', \''.$config_value.'\')') or error('Unable to insert config value \''.$config_name.'\'', __FILE__, __LINE__, $db->error());
+	}
+
+	function delete_config($config_name) {
+		if (!array_key_exists($config_name, $luna_config))
+			return $this->query('DELETE FROM '.$this->prefix.'config WHERE conf_name = \''.$config_name.'\'') or error('Unable to remove config value \''.$config_name.'\'', __FILE__, __LINE__, $db->error());
 	}
 
 	function truncate_table($table_name) {

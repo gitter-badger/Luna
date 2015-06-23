@@ -312,6 +312,16 @@ class DBConnect {
 		return $this->query('ALTER TABLE '.$this->prefix.$table_name.' DROP INDEX '.$this->prefix.$table_name.'_'.$index_name) ? true : false;
 	}
 
+	function add_config($config_name, $config_value) {
+		if (!array_key_exists($config_name, $luna_config))
+			return $this->query('INSERT INTO '.$this->prefix.'config (conf_name, conf_value) VALUES (\''.$config_name.'\', \''.$config_value.'\')') or error('Unable to insert config value \''.$config_name.'\'', __FILE__, __LINE__, $db->error());
+	}
+
+	function delete_config($config_name) {
+		if (!array_key_exists($config_name, $luna_config))
+			return $this->query('DELETE FROM '.$this->prefix.'config WHERE conf_name = \''.$config_name.'\'') or error('Unable to remove config value \''.$config_name.'\'', __FILE__, __LINE__, $db->error());
+	}
+
 	function truncate_table($table_name) {
 		return $this->query('TRUNCATE TABLE '.$this->prefix.$table_name) ? true : false;
 	}
