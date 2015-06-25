@@ -191,6 +191,12 @@ body {
 	border-radius: 0;
 }
 
+label .help-block {
+	font-weight: 400;
+	font-size: 85%;
+	letter-spacing: .5px;
+}
+
 /****************************************
  * General classes
  ***************************************/
