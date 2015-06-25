@@ -1964,11 +1964,11 @@ function forum_is_writable($path) {
 //
 // Display executed queries (if enabled)
 //
-function display_saved_queries() {
+function display_stored_queries() {
 	global $db, $lang;
 
 	// Get the queries so that we can print them out
-	$saved_queries = $db->get_saved_queries();
+	$saved_queries = $db->get_stored_queries();
 
 ?>
 <div class="debug panel panel-warning">

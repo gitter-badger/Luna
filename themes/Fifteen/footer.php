@@ -182,7 +182,7 @@ $db->end_connection();
 
 // Display executed queries (if enabled)
 if (defined('FORUM_SHOW_QUERIES'))
-	display_saved_queries();
+	display_stored_queries();
 
 
 // Close the db connection (and free up any result data)

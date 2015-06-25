@@ -9,7 +9,7 @@
 if (!class_exists('SQLite3'))
 	exit('Your host does not support SQLite 3. SQLite 3 support is required to use a SQLite 3 database to run Luna.');
 
-class DBLayer {
+class DBConnect {
 	var $datatype_transforms = array(
 		'%^SERIAL$%'															=>	'INTEGER',
 		'%^(TINY|SMALL|MEDIUM|BIG)?INT( )?(\\([0-9]+\\))?( )?(UNSIGNED)?$%i'	=>	'INTEGER',
@@ -54,7 +54,7 @@ class DBLayer {
 	}
 	
 	
-	function DBLayer($db_host, $db_username, $db_password, $db_name, $db_prefix, $p_connect) {  
+	function DBConnect($db_host, $db_username, $db_password, $db_name, $db_prefix, $p_connect) {  
 		$this->__construct($db_host, $db_username, $db_password, $db_name, $db_prefix, $p_connect);
 	}
 

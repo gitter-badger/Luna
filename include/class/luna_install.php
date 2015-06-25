@@ -193,7 +193,7 @@ class Installer {
 		Installer::load_database_driver($db_type);
 		
 		// Create the database object (and connect/select db)
-		$db = new DBLayer($db_host, $db_username, $db_password, $db_name, $db_prefix, false);
+		$db = new DBConnect($db_host, $db_username, $db_password, $db_name, $db_prefix, false);
 		
 		// Do some DB type specific checks
 		Installer::validate_database_version($db_type, $db);
