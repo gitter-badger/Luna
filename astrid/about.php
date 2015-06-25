@@ -65,4 +65,4 @@ Astrid::DrawAstridNav( 'about', 'backstage' );
 		</div>
 	</div>
 </div>
-<?php include('include/footer.php') ?>
+<?php include( 'include/footer.php' ) ?>

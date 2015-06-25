@@ -75,4 +75,4 @@ Astrid::DrawAstridNav( 'system', 'backstage' );
 		</tbody>
 	</table>
 </div>
-<?php include('include/footer.php') ?>
+<?php include( 'include/footer.php' ) ?>
