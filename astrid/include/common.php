@@ -22,6 +22,8 @@ if ( !defined( 'JEWEL' ) ) {
 	exit;
 }
 
+require JEWEL_ROOT.'/astrid/include/general_functions.php';
+
 // Load the datbase layer,  and connect
 require JEWEL_ROOT.'/include/jeweldblayer/get_db.php';
 
