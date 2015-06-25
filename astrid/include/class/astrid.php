@@ -7,14 +7,19 @@
 
 class Astrid {
 	public function DrawAstridNav( $page, $section ) {
+		// Backstage section
 		if ( $page == 'backstage' )
-			$page_title = "Welcome back, Astrid!";
+			$page_title = '<i class="fa fa-fw fa-dashboard"></i> Welcome back, Astrid!';
 		if ( $page == 'system' )
-			$page_title = "System info";
+			$page_title = '<i class="fa fa-fw fa-info-circle"></i> System info';
 		if ( $page == 'update' )
-			$page_title = "Luna software update";
+			$page_title = '<i class="fa fa-fw fa-cload-upload"></i> Luna software update';
 		if ( $page == 'about' )
-			$page_title = "About Luna";
+			$page_title = '<i class="fa fa-fw fa-moon-o"></i> About Luna';
+		
+		// Settings section
+		if ( $page == 'settings' )
+			$page_title = '<i class="fa fa-fw fa-cogs"></i>  Essentials';
 		
 ?>
 <nav class="navbar navbar-default">
@@ -59,14 +64,18 @@ class Astrid {
 	<div class="container">
 		<div class="row">
 			<h2 class="hidden-xs">
-				<i class="fa fa-fw fa-dashboard"></i> <?php echo $page_title ?>
+				<?php echo $page_title ?>
 				<span class="pull-right" style="font-size: 70%;"> <?php echo Version::LUNA_JEWEL_VERSION ?></span>
 			</h2>
 			<ul class="nav nav-tabs" role="tablist">
-				<li class="<?php if ($page == 'backstage') echo 'active'; ?>"><a href="index.php"><i class="fa fa-fw fa-tachometer"></i><span class="hidden-xs"> Backstage</span></a></li>
-				<li class="<?php if ($page == 'system') echo 'active'; ?>"><a href="system.php"><i class="fa fa-fw fa-info-circle"></i><span class="hidden-xs"> System info</span></a></li>
-				<li class="<?php if ($page == 'update') echo 'active'; ?>"><a href="update.php"><i class="fa fa-fw fa-cloud-upload"></i><span class="hidden-xs"> Update</span></a></li>
-				<li class="pull-right<?php if ($page == 'about') echo ' active'; ?>"><a href="about.php"><i class="fa fa-fw fa-moon-o"></i><span class="hidden-xs"> About</span></a></li>
+				<?php if ( $section == "backstage" ) { ?>
+					<li class="<?php if ($page == 'backstage') echo 'active'; ?>"><a href="index.php"><i class="fa fa-fw fa-tachometer"></i><span class="hidden-xs"> Backstage</span></a></li>
+					<li class="<?php if ($page == 'system') echo 'active'; ?>"><a href="system.php"><i class="fa fa-fw fa-info-circle"></i><span class="hidden-xs"> System info</span></a></li>
+					<li class="<?php if ($page == 'update') echo 'active'; ?>"><a href="update.php"><i class="fa fa-fw fa-cloud-upload"></i><span class="hidden-xs"> Update</span></a></li>
+					<li class="pull-right<?php if ($page == 'about') echo ' active'; ?>"><a href="about.php"><i class="fa fa-fw fa-moon-o"></i><span class="hidden-xs"> About</span></a></li>
+				<?php } if ( $section == "settings" ) { ?>
+					<li class="<?php if ($page == 'settings') echo 'active'; ?>"><a href="settings.php"><i class="fa fa-fw fa-cogs"></i><span class="hidden-xs"> Essentials</span></a></li>
+				<?php } ?>
 			</ul>
 		</div>
 	</div>
