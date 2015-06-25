@@ -23,25 +23,25 @@ Astrid::DrawAstridNav( 'settings', 'settings' );
 				<div class="form-group">
 					<label class="col-sm-3 control-label">Board title</label>
 					<div class="col-sm-9">
-						<input type="text" class="form-control" name="form[board_title]" maxlength="255" value="" />
+						<input type="text" class="form-control" name="form[board_title]" maxlength="255" value="<?php echo $luna_config['o_board_title'] ?>" />
 					</div>
 				</div>
 				<div class="form-group">
 					<label class="col-sm-3 control-label">Board description<span class="help-block">What's this board about?</span></label>
 					<div class="col-sm-9">
-						<input type="text" class="form-control" name="form[board_desc]" maxlength="255" value="" />
+						<input type="text" class="form-control" name="form[board_desc]" maxlength="255" value="<?php echo $luna_config['o_board_desc'] ?>" />
 					</div>
 				</div>
 				<div class="form-group">
 					<label class="col-sm-3 control-label">Board tags<span class="help-block">Add some words that describe your board, separated by a comma</span></label>
 					<div class="col-sm-9">
-						<input type="text" class="form-control" name="form[board_tags]" maxlength="255" value="" />
+						<input type="text" class="form-control" name="form[board_tags]" maxlength="255" value="<?php echo $luna_config['o_board_tags'] ?>" />
 					</div>
 				</div>
 				<div class="form-group">
 					<label class="col-sm-3 control-label">Board URL</label>
 					<div class="col-sm-9">
-						<input type="text" class="form-control" name="form[base_url]" maxlength="100" value="" />
+						<input type="text" class="form-control" name="form[base_url]" maxlength="100" value="<?php echo $luna_config['o_base_url'] ?>" />
 					</div>
 				</div>
 				<div class="form-group">
