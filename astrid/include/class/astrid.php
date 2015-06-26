@@ -36,11 +36,11 @@ class Astrid {
 		<div class="collapse navbar-collapse" id="main-nav">
 			<ul class="nav navbar-nav">
 				<li class="<?php if ($section == 'backstage') echo 'active'; ?>"><a href="index.php"><span class="fa fa-fw fa-dashboard"></span> Backstage</a></li>
-				<li class="<?php if ($section == 'content') echo 'active'; ?>"><a href="board.php"><span class="fa fa-fw fa-file"></span> Content</a></li>
-				<li class="<?php if ($section == 'users') echo 'active'; ?>"><a href="users.php"><span class="fa fa-fw fa-users"></span> Users</a></li>
+				<!--<li class="<?php if ($section == 'content') echo 'active'; ?>"><a href="board.php"><span class="fa fa-fw fa-file"></span> Content</a></li>
+				<li class="<?php if ($section == 'users') echo 'active'; ?>"><a href="users.php"><span class="fa fa-fw fa-users"></span> Users</a></li>-->
 				<li class="<?php if ($section == 'settings') echo 'active'; ?>"><a href="settings.php"><span class="fa fa-fw fa-cog"></span> Settings</a>
-				<li class="<?php if ($section == 'maintenance') echo 'active'; ?>"><a href="maintenance.php"><span class="fa fa-fw fa-coffee"></span> Maintenance</a></li>
-				<li><a href="#"><i class="fa fa-fw fa-plus"></i> Extras</a></li>
+				<!--<li class="<?php if ($section == 'maintenance') echo 'active'; ?>"><a href="maintenance.php"><span class="fa fa-fw fa-coffee"></span> Maintenance</a></li>
+				<li class="<?php if ($section == 'extras') echo 'active'; ?>"><a href="plugins.php"><i class="fa fa-fw fa-plus"></i> Extras</a></li>-->
 			</ul>
 			<ul class="nav navbar-nav navbar-right">
 				<li><a href="#"><i class="fa fa-fw fa-circle-o"></i><span class="visible-xs-inline"> Notifications</span></a></li>
